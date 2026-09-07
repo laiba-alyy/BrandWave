@@ -13,17 +13,17 @@ Next.js frontend, FastAPI backend, Supabase auth and data.
 
 ## Live Demo
 
+**https://54.144.145.194.sslip.io**
+
 | | |
 |---|---|
-| **Application** | `http://<elastic-ip>:3000` |
-| **API docs (Swagger)** | `http://<elastic-ip>:8000/docs` |
-| **API health** | `http://<elastic-ip>:8000/health` |
+| **Application** | https://54.144.145.194.sslip.io |
+| **API docs (Swagger)** | https://54.144.145.194.sslip.io/docs |
+| **API health** | https://54.144.145.194.sslip.io/health |
 
-Deployed on **AWS EC2** behind an Elastic IP. See [Deployment](#deployment-aws-ec2)
-to reproduce the setup from scratch.
-
-> Prefer to run it yourself? [Getting Started](#getting-started) takes about 15
-> minutes, most of it waiting on `pip install`.
+Running on **AWS EC2** behind an Elastic IP, served over **HTTPS by Caddy**,
+which terminates TLS and routes both services under one origin. See
+[Deployment](#deployment-aws-ec2) to reproduce the setup from scratch.
 
 ---
 
@@ -47,21 +47,25 @@ to reproduce the setup from scratch.
 ```
 Browser
    |
+   |  HTTPS
    v
-Next.js 16 (App Router)  ------>  Supabase
-   :3000                          auth + Postgres + row-level security
+Caddy  :443                       TLS termination, one public origin
+   |                              54.144.145.194.sslip.io
    |
-   |  NEXT_PUBLIC_API_URL
-   v
-FastAPI  :8000
+   |-- /            -------->  Next.js 16 (App Router)  ----->  Supabase
+   |                           127.0.0.1:3000                   auth + Postgres + RLS
    |
-   |-- scraping/             httpx + BeautifulSoup, Playwright Chromium fallback
-   |-- seo/                  DataForSEO metrics + LLM keyword generation
-   |-- sentiment/            XLM-RoBERTa (local weights, CPU inference)
-   |-- ads_generation/       Gemini / HF / Bria / Claid image pipelines
-   |-- video_ads/            fal.ai (Kling, Veo 3.1) + moviepy end cards
-   |-- chatbot_automation/   Pinecone retrieval + SMTP escalation
-   `-- ai_assistant/         Groq-backed conversational layer
+   `-- /api/*  /docs  /health  ->  FastAPI
+                                   127.0.0.1:8000
+                                      |
+                                      |-- scraping/            httpx + BeautifulSoup,
+                                      |                        Playwright Chromium fallback
+                                      |-- seo/                 DataForSEO + LLM keywords
+                                      |-- sentiment/           XLM-RoBERTa, CPU inference
+                                      |-- ads_generation/      Gemini / HF / Bria / Claid
+                                      |-- video_ads/           fal.ai + moviepy end cards
+                                      |-- chatbot_automation/  Pinecone + SMTP escalation
+                                      `-- ai_assistant/        Groq conversational layer
 ```
 
 The frontend never holds a provider key. Every third-party call is made
@@ -289,7 +293,17 @@ their provider keys.
 
 ## Deployment (AWS EC2)
 
-BrandWave is deployed on an EC2 instance with an Elastic IP, managed over SSH.
+BrandWave runs on an EC2 instance with an Elastic IP, managed over SSH, with
+**Caddy** in front terminating TLS and reverse-proxying both services under a
+single HTTPS origin.
+
+The public hostname is `54.144.145.194.sslip.io`. [sslip.io](https://sslip.io)
+is a free wildcard DNS service that resolves any hostname containing an IP back
+to that IP — so `54.144.145.194.sslip.io` resolves to `54.144.145.194` with no
+domain registration and no DNS setup. That matters because Caddy needs a real
+hostname to obtain a Let's Encrypt certificate; it cannot issue one for a bare
+IP address. This gives the demo working HTTPS for free.
+
 These are the steps to reproduce it.
 
 ### 1. Provision the instance
@@ -305,16 +319,25 @@ These are the steps to reproduce it.
 
 ### 2. Security group
 
+Only Caddy is public. The app ports stay closed to the internet — traffic
+reaches them through the proxy on the instance itself.
+
 | Port | Source | Purpose |
 |---|---|---|
 | 22 | your IP only | SSH |
-| 3000 | 0.0.0.0/0 | Frontend |
-| 8000 | 0.0.0.0/0 | Backend API |
+| 80 | 0.0.0.0/0 | HTTP — Caddy redirects to HTTPS, and Let's Encrypt validates here |
+| 443 | 0.0.0.0/0 | HTTPS — all application traffic |
+| ~~3000~~ | — | Frontend. **Not exposed.** Caddy proxies it locally. |
+| ~~8000~~ | — | Backend. **Not exposed.** Caddy proxies it locally. |
+
+Port 80 must stay open even though everything redirects to HTTPS — Let's
+Encrypt's HTTP-01 challenge uses it, and certificate renewal fails silently
+without it. The certificate then expires ~90 days later, mid-demo.
 
 ### 3. Connect and install system dependencies
 
 ```bash
-ssh -i your-key.pem ubuntu@<elastic-ip>
+ssh -i your-key.pem ubuntu@54.144.145.194
 
 sudo apt update && sudo apt upgrade -y
 
@@ -340,25 +363,33 @@ Create both env files **on the server**. They are gitignored by design, so they
 never arrive via `git pull` — copy them across separately:
 
 ```bash
-scp -i your-key.pem .env         ubuntu@<elastic-ip>:~/BrandWave/.env
-scp -i your-key.pem backend/.env ubuntu@<elastic-ip>:~/BrandWave/backend/.env
+scp -i your-key.pem .env         ubuntu@54.144.145.194:~/BrandWave/.env
+scp -i your-key.pem backend/.env ubuntu@54.144.145.194:~/BrandWave/backend/.env
 ```
 
-Point every URL at the Elastic IP, **not** localhost:
+Point every URL at the **public HTTPS origin** — not localhost, and not an
+`http://ip:port` pair. Because Caddy serves both services under one hostname,
+every value is the same origin with **no port number**:
 
 ```env
 # .env  (frontend)
-NEXT_PUBLIC_API_URL=http://<elastic-ip>:8000
+NEXT_PUBLIC_API_URL=https://54.144.145.194.sslip.io
 
 # backend/.env
-BACKEND_PUBLIC_URL=http://<elastic-ip>:8000
-FRONTEND_URL=http://<elastic-ip>:3000
-CORS_ALLOWED_ORIGINS=http://<elastic-ip>:3000
+BACKEND_PUBLIC_URL=https://54.144.145.194.sslip.io
+FRONTEND_URL=https://54.144.145.194.sslip.io
+CORS_ALLOWED_ORIGINS=https://54.144.145.194.sslip.io
 ```
 
-`CORS_ALLOWED_ORIGINS` must match the frontend origin **exactly** — scheme, host,
-and port — or every API call fails in the browser with a CORS error while the
-server logs look perfectly healthy.
+The frontend builds request paths as `${NEXT_PUBLIC_API_URL}/api/...`, and Caddy
+routes anything starting with `/api` to FastAPI — so the origin alone is correct
+here. Appending `:8000` would point the browser at a port the security group
+does not expose.
+
+`CORS_ALLOWED_ORIGINS` must match the browser's origin **exactly** — scheme,
+host, and port. `http://` instead of `https://` is a mismatch, and so is a
+trailing slash. Get it wrong and every API call fails in the browser with a CORS
+error while the server logs look perfectly healthy.
 
 ### 5. Install and build
 
@@ -394,26 +425,84 @@ Start them so they survive the SSH session ending and come back after a reboot �
 #           ~1 GB copy of the sentiment model.
 cd ~/BrandWave/backend
 source .venv/bin/activate
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
+uvicorn main:app --host 127.0.0.1 --port 8000 --workers 1
 
 # Frontend
 cd ~/BrandWave
 npm run start
 ```
 
+Both bind to **localhost only**. Caddy is on the same host and reaches them
+there; binding to `0.0.0.0` would put them on the public interface, bypassing
+TLS. The security group blocks those ports anyway — this is the second layer,
+not the only one.
+
 > Backgrounding with plain `nohup ... &` works but does **not** survive an
 > instance reboot. If the demo has to stay up, use `pm2 save && pm2 startup` or a
 > `systemd` unit with `Restart=always`.
 
-### 7. Verify
+### 7. Caddy — TLS and routing
 
 ```bash
-curl http://<elastic-ip>:8000/health          # module status
-curl http://<elastic-ip>:8000/api/scraping/health
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
+  | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' \
+  | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update && sudo apt install -y caddy
 ```
 
-Then open `http://<elastic-ip>:3000` in a browser and check the console — a
-working frontend makes no requests to `localhost:8000`.
+Write `/etc/caddy/Caddyfile`. This is the routing the live deployment serves —
+one origin, frontend at the root, FastAPI on the API paths:
+
+```caddyfile
+54.144.145.194.sslip.io {
+    # FastAPI — everything the backend owns.
+    handle /api/* {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle /docs* {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle /openapi.json {
+        reverse_proxy 127.0.0.1:8000
+    }
+    handle /health {
+        reverse_proxy 127.0.0.1:8000
+    }
+
+    # Everything else — Next.js.
+    handle {
+        reverse_proxy 127.0.0.1:3000
+    }
+}
+```
+
+```bash
+sudo systemctl reload caddy
+```
+
+Caddy obtains and renews the Let's Encrypt certificate automatically on first
+request — no certbot, no cron job. It also enables HTTP/3 and redirects
+`http://` to `https://` by default.
+
+**WebSockets need no extra configuration.** Two endpoints run on them —
+`/api/chatbot/ws/{user_id}` and `/api/scraping/scrape-progress/{uid}` — and
+Caddy's `reverse_proxy` upgrades connections automatically. They fall under the
+`/api/*` rule already.
+
+### 8. Verify
+
+```bash
+curl https://54.144.145.194.sslip.io/health                    # module status
+curl https://54.144.145.194.sslip.io/api/scraping/health
+curl -I https://54.144.145.194.sslip.io/                       # expect: Via: 1.1 Caddy
+```
+
+Then open the site in a browser and check the console — a working frontend makes
+**no** requests to `localhost:8000` and **no** mixed-content warnings. If you see
+`Blocked loading mixed active content`, `NEXT_PUBLIC_API_URL` still says `http://`
+and the frontend needs a rebuild, not a restart.
 
 ### Redeploying after a push
 
@@ -445,6 +534,10 @@ Then restart both services.
 | Embedded chatbot widget works for you, fails for visitors | `BACKEND_PUBLIC_URL` still points at localhost | Set it to the public backend URL, then regenerate the embed snippet |
 | Video ads fail at the end-card step | FFmpeg not on PATH | Install FFmpeg (see [Prerequisites](#prerequisites)) |
 | `No space left on device` during install | 8 GB default EC2 volume | Expand the root volume to 30 GB |
+| `Blocked loading mixed active content` | Page is HTTPS but `NEXT_PUBLIC_API_URL` is `http://` | Set it to the `https://` origin and **rebuild** the frontend |
+| `502 Bad Gateway` from Caddy | The upstream service is not running, or bound to the wrong interface | Check both processes are up and listening on `127.0.0.1`; `sudo journalctl -u caddy -f` |
+| Certificate expired / renewal failed | Port 80 closed in the security group | Let's Encrypt validates over HTTP-01 on port 80 — reopen it, then `sudo systemctl reload caddy` |
+| WebSocket features (chat alerts, scrape progress) never connect | Request not matching the `/api/*` proxy rule | Confirm the path starts with `/api`; Caddy upgrades connections automatically |
 
 ---
 
