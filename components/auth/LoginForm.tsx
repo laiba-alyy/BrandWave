@@ -51,26 +51,34 @@ export default function LoginForm() {
       if (authError) throw new Error(authError.message)
 
       const { data: userData, error: userError } = await supabase
-        .from('users').select('id, business_name, email_verified, role')
+        .from('users').select('id, business_name, role')
         .eq('id', authData.user.id).maybeSingle()
       if (userError) throw new Error(userError.message)
 
       let appUser = userData
       if (!appUser) {
         const businessName = (authData.user.user_metadata?.business_name as string)?.trim() || 'My Business'
-        const inferredRole = authData.user.user_metadata?.role === 'admin' ? 'admin' : 'user'
+        // `role` aur `email_verified` yahan se JAAN BOOJH KAR nikale gaye hain.
+        //
+        // role pehle `user_metadata.role` se aata tha — aur user_metadata woh
+        // cheez hai jo client khud signUp() ke `data:` mein bhejta hai. Yani
+        // koi bhi `data: { role: 'admin' }` bhej kar pehle hi login par khud
+        // ko admin bana leta tha. Ab role table ke default ('user') se aata
+        // hai; promote karna sirf service-role key se hota hai.
+        //
+        // email_verified ka bhi yehi masla tha: user khud ko verified mark kar
+        // sakta tha, is liye us flag ki koi qeemat nahi thi. Ab wo auth.users
+        // .email_confirmed_at se trigger ke zariye aata hai (db/policies.sql).
+        //
+        // Dono columns par `authenticated` ka column-level grant revoke ho
+        // chuka hai — yahan bhejne se ab "permission denied for column" aata.
         const { data: insertedUser, error: insertError } = await supabase
           .from('users').insert({
             id: authData.user.id, email: authData.user.email,
-            business_name: businessName, role: inferredRole,
-            email_verified: true, auth_provider: 'email',
-          }).select('id, business_name, email_verified, role').single()
+            business_name: businessName, auth_provider: 'email',
+          }).select('id, business_name, role').single()
         if (insertError) throw new Error(insertError.message)
         appUser = insertedUser
-      }
-
-      if (!appUser.email_verified) {
-        await supabase.from('users').update({ email_verified: true }).eq('id', authData.user.id)
       }
 
       router.push(appUser.role === 'admin' ? '/admin' : '/business')

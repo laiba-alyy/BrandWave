@@ -43,8 +43,6 @@ export default function CallbackPage() {
           }
         }
 
-        const selectedRole = sessionStorage.getItem("selectedRole");
-
         // OAuth callback for admin/business signup or login.
         const {
           data: { session },
@@ -53,7 +51,6 @@ export default function CallbackPage() {
         if (sessionError) throw sessionError;
         if (!session?.user?.email) throw new Error("No authenticated user");
 
-        const role = selectedRole === "admin" ? "admin" : "user";
         const businessName = sessionStorage.getItem("businessName") || "My Business";
 
         const { data: existingUser, error: fetchError } = await supabase
@@ -63,27 +60,36 @@ export default function CallbackPage() {
           .maybeSingle();
         if (fetchError) throw fetchError;
 
+        // Role AB sessionStorage se NAHI aata.
+        //
+        // Pehle yahan `selectedRole` parha jata tha, jo /admin-login ka Google
+        // button set karta hai — aur sessionStorage puri tarah client ki cheez
+        // hai. Yani koi bhi banda /admin-login khol kar, kisi bhi Google account
+        // se sign in kar ke, apni row `role: 'admin'` ke saath insert kar leta
+        // tha. Koi exploit nahi chahiye tha, wo ek supported UI path tha.
+        //
+        // Ab role sirf DB se parha jata hai: nayi row table ke default ('user')
+        // par banti hai, aur promote karna sirf service-role key se mumkin hai.
+        let appRole = existingUser?.role;
+
         if (!existingUser) {
-          const { error: insertError } = await supabase.from("users").insert({
-            id: session.user.id,
-            email: session.user.email,
-            business_name: businessName,
-            email_verified: true,
-            auth_provider: "google",
-            role,
-          });
-          if (insertError) throw insertError;
-        } else {
-          const { error: updateError } = await supabase
+          const { data: insertedUser, error: insertError } = await supabase
             .from("users")
-            .update({ email_verified: true })
-            .eq("id", session.user.id);
-          if (updateError) throw updateError;
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              business_name: businessName,
+              auth_provider: "google",
+            })
+            .select("role")
+            .single();
+          if (insertError) throw insertError;
+          appRole = insertedUser.role;
         }
 
         sessionStorage.removeItem("businessName");
         sessionStorage.removeItem("selectedRole");
-        router.push(role === "admin" ? "/admin" : "/business");
+        router.push(appRole === "admin" ? "/admin" : "/business");
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Authentication failed");
         setTimeout(() => router.push("/login"), 2500);

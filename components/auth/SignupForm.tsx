@@ -55,22 +55,30 @@ export default function SignupForm() {
       setError(null)
       const normalizedEmail = values.email.trim().toLowerCase()
 
-      const { data: existingUser, error: existingUserError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', normalizedEmail)
-        .maybeSingle()
-      if (existingUserError) throw existingUserError
-      if (existingUser) {
-        throw new Error('An account already exists with this email. Please sign in instead.')
-      }
-
+      // Pehle yahan ek "duplicate email" pre-flight check tha jo public.users
+      // ko query karta tha. Wo do wajah se hataya gaya:
+      //
+      // 1. Us waqt visitor abhi `anon` hota hai, aur saari RLS policies
+      //    `to authenticated` hain — to query hamesha 0 rows deti thi. Check
+      //    khamoshi se HAMESHA pass hone laga tha, yani kaam hi nahi kar raha tha.
+      // 2. Isay `anon` ke liye khol dena email-enumeration endpoint bana deta:
+      //    koi bhi ek ek email daal kar pata kar leta ke kis ka account hai.
+      //
+      // Duplicate ka kya hota hai: Supabase JAAN BOOJH KAR error nahi deta.
+      // Confirm-email on ho to mojooda email par wo ek user object wapas karta
+      // hai jiska `identities` khali hota hai, aur visitor ko wahi "inbox check
+      // karein" screen milti hai. Yehi uska anti-enumeration design hai — hum
+      // usay bypass karne ki koshish NAHI kar rahe.
+      //
+      // `role` user_metadata se hata diya gaya. Wo kabhi authoritative tha hi
+      // nahi (client jo chahe bhej sakta hai), aur ab koi use bhi nahi karta —
+      // chhorne se sirf yeh ghalat-fehmi paida hoti ke role yahan se aata hai.
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: normalizedEmail,
         password: values.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/verify-email`,
-          data: { business_name: values.businessName.trim(), role: 'user' },
+          data: { business_name: values.businessName.trim() },
         },
       })
       if (signUpError) throw signUpError

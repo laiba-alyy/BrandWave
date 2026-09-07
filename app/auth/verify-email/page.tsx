@@ -63,14 +63,20 @@ export default function VerifyEmailPage() {
           (verifiedUser.user_metadata?.business_name as string | undefined)?.trim() ||
           'My Business'
 
+        // `role` aur `email_verified` yahan se nikal diye gaye hain — dono ab
+        // client ke likhne wale columns nahi rahe (dekho db/policies.sql).
+        //
+        // ignoreDuplicates isliye: upsert `INSERT ... ON CONFLICT DO UPDATE`
+        // banta hai, aur DO UPDATE ko har us column par UPDATE ka haq chahiye
+        // jo wo naam leta hai. Row pehle se mojood ho to hamein kuch badalna
+        // hi nahi — is liye ON CONFLICT DO NOTHING kaafi hai, jo sirf INSERT
+        // ka grant maangta hai.
         const { error: upsertError } = await supabase.from('users').upsert({
           id: verifiedUser.id,
           email: verifiedUser.email,
           business_name: businessName,
-          email_verified: true,
           auth_provider: 'email',
-          role: 'user',
-        })
+        }, { onConflict: 'id', ignoreDuplicates: true })
         if (upsertError) throw upsertError
 
         setSuccess(true)
