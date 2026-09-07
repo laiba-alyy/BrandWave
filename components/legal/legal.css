@@ -1,0 +1,175 @@
+/*
+ * Legal pages (privacy, terms) ka layout.
+ *
+ * Tokens landing.css se aate hain — is liye ye pages `bw-landing` class ke
+ * andar render hote hain. Yahan sirf prose ki typography hai, koi naya rang
+ * nahi, taake legal safhe baqi site jaise hi lagen.
+ */
+.bw-landing .legal {
+  min-height: 100svh;
+  padding: 0 var(--pad) 96px;
+}
+
+.bw-landing .legal__in {
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.bw-landing .legal__head {
+  padding: 72px 0 40px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 44px;
+}
+
+.bw-landing .legal__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.bw-landing .legal__back:hover {
+  color: var(--amber);
+}
+
+.bw-landing .legal__title {
+  margin: 22px 0 12px;
+  font-family: var(--f-display);
+  font-size: clamp(32px, 5vw, 52px);
+  font-variation-settings: "opsz" 96;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  color: var(--text);
+}
+
+.bw-landing .legal__meta {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--text-mute);
+}
+
+.bw-landing .legal__lede {
+  margin-top: 20px;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--text-dim);
+}
+
+.bw-landing .legal h2 {
+  margin: 44px 0 14px;
+  font-family: var(--f-display);
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
+.bw-landing .legal h2:first-of-type {
+  margin-top: 0;
+}
+
+.bw-landing .legal h3 {
+  margin: 26px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--text);
+}
+
+.bw-landing .legal p,
+.bw-landing .legal li {
+  font-size: 14.5px;
+  line-height: 1.72;
+  color: var(--text-dim);
+}
+.bw-landing .legal p {
+  margin: 0 0 14px;
+}
+
+.bw-landing .legal ul {
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+.bw-landing .legal li {
+  margin-bottom: 7px;
+}
+.bw-landing .legal li::marker {
+  color: var(--amber);
+}
+
+.bw-landing .legal strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.bw-landing .legal a {
+  color: var(--amber);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(240, 166, 60, 0.35);
+  transition: border-color 0.2s ease;
+}
+.bw-landing .legal a:hover {
+  border-bottom-color: var(--amber);
+}
+
+/* Third-party processors ki table — mobile par apne aap scroll hoti hai. */
+.bw-landing .legal__tablewrap {
+  overflow-x: auto;
+  margin: 0 0 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+}
+.bw-landing .legal table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  min-width: 460px;
+}
+.bw-landing .legal th,
+.bw-landing .legal td {
+  padding: 11px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.bw-landing .legal th {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  background: rgba(240, 166, 60, 0.05);
+}
+.bw-landing .legal td {
+  color: var(--text-dim);
+}
+.bw-landing .legal tr:last-child td {
+  border-bottom: 0;
+}
+
+.bw-landing .legal__note {
+  margin-top: 40px;
+  padding: 16px 18px;
+  border: 1px solid rgba(240, 166, 60, 0.28);
+  border-radius: var(--r-md);
+  background: rgba(240, 166, 60, 0.06);
+}
+.bw-landing .legal__note p {
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.bw-landing .legal__foot {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}

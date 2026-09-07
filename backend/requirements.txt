@@ -1,0 +1,78 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# BrandWave — backend dependencies
+#
+# Versions yahan wo hain jo is waqt chal rahe environment mein VERIFIED hain
+# (Python 3.12). Fresh machine par:
+#
+#     python -m venv .venv
+#     .venv/Scripts/activate          # Linux/Mac: source .venv/bin/activate
+#     pip install -r requirements.txt
+#     playwright install chromium     # <-- ZAROORI: scraper ka JS fallback
+#
+# NOTE: sentiment model weights (~1.04 GB) repo mein NAHI hain (.gitignore dekho).
+# Naye machine par model.safetensors alag se copy karna parega, warna
+# /analyze-from-dropdown 503 dega.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Web framework ────────────────────────────────────────────────────────────
+# uvicorn[standard] — plain `uvicorn` ke saath `websockets` install NAHI hota,
+# aur do endpoints WebSocket par hain:
+#   /api/chatbot/ws/{user_id}            (live conversation alerts)
+#   /api/scraping/scrape-progress/{uid}  (scrape progress bar)
+# Extra ke baghair ye dono runtime par fail karte hain.
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-dotenv==1.0.0
+python-multipart==0.0.9
+pydantic==2.7.0
+httpx==0.27.0
+
+# ── Scraping (Module 2) ──────────────────────────────────────────────────────
+beautifulsoup4==4.12.3
+playwright==1.44.0
+requests==2.31.0
+lxml==4.9.3
+
+# ── Data extraction / image handling ─────────────────────────────────────────
+Pillow==10.3.0
+colorthief==0.2.1
+rembg==2.0.57
+
+# ── Database ─────────────────────────────────────────────────────────────────
+sqlalchemy==2.0.35
+psycopg[binary]==3.2.10
+alembic==1.13.1
+
+# ── LLM (Groq — saare text modules isi par chalte hain) ──────────────────────
+groq==0.9.0
+
+# ── Chatbot Automation (Module 6) — RAG stack ────────────────────────────────
+# NOTE: package ka naam `pinecone` hai, `pinecone-client` NAHI.
+# `pinecone-client` ab deprecated hai aur v6+ install par error deta hai
+# ("Please install the `pinecone` package instead"). Code `from pinecone import
+# Pinecone` karta hai, to purana naam fresh install todta tha.
+pinecone==9.1.0
+sentence-transformers==5.7.0
+PyPDF2==3.0.1
+python-docx==1.2.0
+
+# ── Sentiment — XLM-RoBERTa multilingual classifier (Module 4) ───────────────
+torch==2.13.0
+transformers==5.15.0
+emoji==2.15.0
+# numpy sentiment inference (services/inference.py) mein directly import hota
+# hai — pehle ye list mein tha hi nahi aur sirf transitively aa raha tha.
+numpy==2.5.2
+scikit-learn==1.5.0
+
+# ── SEO — PDF export (audit + blog) ──────────────────────────────────────────
+reportlab==5.0.0
+
+# ── Ads generation (Module 5) ────────────────────────────────────────────────
+moviepy==2.2.1
+openai==3.1.0
+huggingface-hub==1.27.0
+# google-generativeai sirf legacy script modules/ads_generation/key.py ke liye
+# chahiye — chalti hui app ise import nahi karti. Wo script chalani ho to
+# uncomment karo:
+# google-generativeai==0.8.5

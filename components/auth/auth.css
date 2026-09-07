@@ -1,0 +1,892 @@
+/* ============================================================
+   BrandWave — auth theme (login / signup / password recovery)
+   ------------------------------------------------------------
+   Landing page ka world dark hai (components/home/landing.css).
+   Auth pages usi palette se banti hain lekin ulti taraf se:
+   CREAM ground + INK panel + AMBER accent. Wohi fonts, wohi
+   amber (#f0a63c), wohi ink (#12201e) — sirf ratio badla hai,
+   taake har page dark na lage aur platform premium mehsoos ho.
+
+   Har selector `.bw-auth` ke neeche scoped hai. Ye zaroori hai:
+   app/globals.css Tailwind import karti hai aur dashboard light
+   Tailwind par chalta hai — scope hatane par dono takra jayenge.
+   Wahi ghalti landing mein `.invert` → `.bw-invert` par pakri gayi
+   thi, is liye yahan har class `au__`/`pnl__` se prefixed hai taake
+   kabhi Tailwind utility se na takraye.
+   ============================================================ */
+
+.bw-auth {
+  /* ground */
+  --cream: #f3eee4;
+  --cream-2: #ece5d7;
+  --cream-hi: #fbf8f1;
+  --cream-line: #ded5c3;
+  --cream-line-2: #cec3ac;
+
+  /* ink */
+  --ink: #0a1413;
+  --ink-2: #12201e;
+  --ink-line: rgba(190, 225, 218, 0.12);
+  --ink-line-2: rgba(190, 225, 218, 0.22);
+  --ink-text: #e9f3f0;
+  --ink-dim: #9db3ae;
+  --ink-mute: #6b837e;
+
+  /* accents — landing se hu-ba-hu */
+  --amber: #f0a63c;
+  --amber-lo: #ffd79b;
+  --amber-deep: #b96c15;
+  --amber-glow: rgba(240, 166, 60, 0.18);
+  --jade: #3ed9a4;
+  --rose: #b4283f;
+  --rose-bg: #fbeaec;
+  --green: #1c6c4b;
+  --green-bg: #e6f4ee;
+
+  /* text on cream */
+  --text: #12201e;
+  --text-dim: #4d5c58;
+  --text-mute: #7d705a;
+
+  --r-sm: 10px;
+  --r-lg: 24px;
+
+  --f-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --f-body: var(--font-instrument-sans), "Helvetica Neue", Arial, sans-serif;
+  --f-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  min-height: 100svh;
+  background: var(--cream);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bw-auth *,
+.bw-auth *::before,
+.bw-auth *::after {
+  box-sizing: border-box;
+}
+
+.bw-auth h1,
+.bw-auth h2,
+.bw-auth h3 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  color: inherit;
+}
+.bw-auth p {
+  margin: 0;
+}
+.bw-auth a {
+  color: inherit;
+  text-decoration: none;
+}
+.bw-auth button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.bw-auth :focus-visible {
+  outline: 2px solid var(--amber-deep);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------- shell ---------- */
+.bw-auth .au {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.84fr);
+  min-height: 100svh;
+}
+@media (max-width: 1020px) {
+  .bw-auth .au {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* left — form side, cream with a soft amber wash in the corner */
+.bw-auth .au__form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(28px, 5vw, 64px);
+  overflow: hidden;
+}
+.bw-auth .au__form::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(620px 380px at 8% -6%, var(--amber-glow), transparent 66%),
+    radial-gradient(520px 420px at 96% 108%, rgba(62, 217, 164, 0.1), transparent 68%);
+}
+.bw-auth .au__form-in {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+}
+.bw-auth .au--wide .au__form-in {
+  max-width: 430px;
+}
+
+/* ---------- brand ---------- */
+.bw-auth .au__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: clamp(26px, 4.5vw, 40px);
+  transition: transform 0.2s ease;
+}
+.bw-auth .au__brand:hover {
+  transform: translateX(2px);
+}
+.bw-auth .au__brand svg {
+  display: block;
+}
+
+/* ---------- headings ---------- */
+.bw-auth .au__eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.bw-auth .au__eyebrow::before {
+  content: "";
+  width: 18px;
+  height: 1px;
+  background: var(--amber-deep);
+  flex: none;
+}
+.bw-auth .au__title {
+  font-size: clamp(31px, 3.6vw, 40px);
+  font-variation-settings: "opsz" 96;
+  margin-top: 14px;
+}
+.bw-auth .au__title em {
+  font-style: italic;
+  color: var(--amber-deep);
+  font-variation-settings: "opsz" 144;
+}
+.bw-auth .au__lede {
+  margin-top: 12px;
+  font-size: 14.5px;
+  color: var(--text-dim);
+  max-width: 42ch;
+}
+.bw-auth .au__head {
+  margin-bottom: 26px;
+}
+
+/* ---------- alerts ---------- */
+.bw-auth .au__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: var(--r-sm);
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+  border: 1px solid transparent;
+  text-align: left;
+}
+.bw-auth .au__alert svg {
+  flex: none;
+  margin-top: 2px;
+}
+.bw-auth .au__alert--error {
+  background: var(--rose-bg);
+  border-color: rgba(180, 40, 63, 0.22);
+  color: var(--rose);
+}
+.bw-auth .au__alert--ok {
+  background: var(--green-bg);
+  border-color: rgba(28, 108, 75, 0.22);
+  color: var(--green);
+}
+
+/* ---------- fields ---------- */
+.bw-auth .au__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.bw-auth .au__field label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  margin-bottom: 7px;
+}
+.bw-auth .au__labelrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+.bw-auth .au__labelrow label {
+  margin-bottom: 0;
+}
+.bw-auth .au__link {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--amber-deep);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+.bw-auth .au__link:hover {
+  border-bottom-color: currentColor;
+}
+
+.bw-auth .au__input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.bw-auth .au__input .au__icon {
+  position: absolute;
+  left: 13px;
+  width: 16px;
+  height: 16px;
+  color: var(--text-mute);
+  pointer-events: none;
+  transition: color 0.18s ease;
+}
+.bw-auth .au__input input {
+  width: 100%;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--text);
+  padding: 12px 14px 12px 40px;
+  background: var(--cream-hi);
+  border: 1px solid var(--cream-line);
+  border-radius: var(--r-sm);
+  transition: border-color 0.18s ease, box-shadow 0.22s ease, background 0.18s ease;
+}
+.bw-auth .au__input input::placeholder {
+  color: #a49b8b;
+}
+.bw-auth .au__input input:hover {
+  border-color: var(--cream-line-2);
+}
+.bw-auth .au__input input:focus {
+  outline: none;
+  background: #fff;
+  border-color: var(--ink-2);
+  box-shadow: 0 0 0 3px rgba(18, 32, 30, 0.08);
+}
+.bw-auth .au__input:focus-within .au__icon {
+  color: var(--ink-2);
+}
+.bw-auth .au__input--pw input {
+  padding-right: 44px;
+}
+.bw-auth .au__eye {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--text-mute);
+  transition: color 0.18s ease, background 0.18s ease;
+}
+.bw-auth .au__eye:hover {
+  color: var(--ink-2);
+  background: var(--cream-2);
+}
+.bw-auth .au__err {
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--rose);
+}
+
+/* checkbox row */
+.bw-auth .au__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+.bw-auth .au__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.bw-auth .au__check input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--ink-2);
+  cursor: pointer;
+}
+
+/* ---------- password rules ---------- */
+.bw-auth .au__rules {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--cream-hi);
+  border: 1px solid var(--cream-line);
+  border-radius: var(--r-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bw-auth .au__rule {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  color: var(--text-mute);
+  transition: color 0.2s ease;
+}
+.bw-auth .au__rule-dot {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--cream-2);
+  border: 1px solid var(--cream-line-2);
+  color: transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.bw-auth .au__rule--on {
+  color: var(--text);
+}
+.bw-auth .au__rule--on .au__rule-dot {
+  background: var(--ink-2);
+  border-color: var(--ink-2);
+  color: var(--amber);
+}
+
+/* ---------- buttons ---------- */
+.bw-auth .au__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  padding: 13px 20px;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.25s ease, color 0.2s ease;
+}
+.bw-auth .au__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+.bw-auth .au__btn--primary {
+  background: var(--amber);
+  color: #1a1206;
+}
+.bw-auth .au__btn--primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px -12px rgba(201, 118, 27, 0.75);
+}
+.bw-auth .au__btn--ink {
+  background: var(--ink-2);
+  color: var(--cream);
+}
+.bw-auth .au__btn--ink:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--ink);
+  box-shadow: 0 12px 30px -14px rgba(18, 32, 30, 0.8);
+}
+.bw-auth .au__btn--ghost {
+  background: transparent;
+  border: 1px solid var(--cream-line-2);
+  color: var(--text);
+}
+.bw-auth .au__btn--ghost:hover:not(:disabled) {
+  background: var(--cream-hi);
+  border-color: var(--ink-2);
+}
+.bw-auth .au__submit {
+  margin-top: 22px;
+}
+
+.bw-auth .au__spin {
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: au-spin 0.7s linear infinite;
+}
+@keyframes au-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- divider ---------- */
+.bw-auth .au__or {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 20px 0;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.bw-auth .au__or::before,
+.bw-auth .au__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--cream-line);
+}
+
+/* ---------- footers ---------- */
+.bw-auth .au__foot {
+  margin-top: 24px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+  text-align: center;
+}
+.bw-auth .au__foot a {
+  color: var(--text);
+  font-weight: 600;
+  border-bottom: 1px solid var(--amber);
+  padding-bottom: 1px;
+  transition: color 0.18s ease;
+}
+.bw-auth .au__foot a:hover {
+  color: var(--amber-deep);
+}
+.bw-auth .au__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-mute);
+  transition: color 0.18s ease, gap 0.18s ease;
+}
+.bw-auth .au__back:hover {
+  color: var(--text);
+  gap: 10px;
+}
+.bw-auth .au__legal {
+  margin-top: 16px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: var(--text-mute);
+  text-align: center;
+}
+.bw-auth .au__legal a {
+  border-bottom: 1px solid var(--cream-line-2);
+}
+.bw-auth .au__legal a:hover {
+  color: var(--text);
+}
+
+/* ============================================================
+   RIGHT — ink panel
+   ============================================================ */
+.bw-auth .au__side {
+  padding: 18px 18px 18px 0;
+}
+@media (max-width: 1020px) {
+  .bw-auth .au__side {
+    display: none;
+  }
+}
+.bw-auth .pnl {
+  position: relative;
+  height: 100%;
+  border-radius: var(--r-lg);
+  background: var(--ink);
+  color: var(--ink-text);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 28px;
+  padding: clamp(30px, 3.2vw, 46px);
+  box-shadow: 0 40px 80px -50px rgba(10, 20, 19, 0.9);
+}
+.bw-auth .pnl::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(640px 380px at 84% 4%, var(--amber-glow), transparent 66%),
+    radial-gradient(520px 400px at 6% 96%, rgba(62, 217, 164, 0.12), transparent 68%);
+}
+.bw-auth .pnl__waves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+.bw-auth .pnl__doodles {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.72;
+}
+.bw-auth .pnl__doodle {
+  position: absolute;
+  display: block;
+  color: var(--amber);
+}
+.bw-auth .pnl__doodle--ring {
+  top: 19%;
+  right: 13%;
+  width: 76px;
+  height: 76px;
+  border: 1px solid rgba(240, 166, 60, 0.4);
+  border-radius: 50%;
+  transform: rotate(-14deg);
+}
+.bw-auth .pnl__doodle--ring::after {
+  content: "";
+  position: absolute;
+  inset: 8px -5px -4px 7px;
+  border: 1px solid rgba(240, 166, 60, 0.22);
+  border-radius: 50%;
+}
+.bw-auth .pnl__doodle--spark {
+  top: 12%;
+  right: 31%;
+  width: 17px;
+  height: 17px;
+  transform: rotate(45deg);
+  border-top: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+}
+.bw-auth .pnl__doodle--curve {
+  left: 9%;
+  bottom: 34%;
+  width: 86px;
+  height: 34px;
+  border-top: 1px solid rgba(62, 217, 164, 0.55);
+  border-radius: 50%;
+  transform: rotate(-12deg);
+}
+.bw-auth .pnl__doodle--dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 5px rgba(240, 166, 60, 0.08);
+}
+.bw-auth .pnl__doodle--dot-one {
+  top: 40%;
+  left: 15%;
+}
+.bw-auth .pnl__doodle--dot-two {
+  right: 20%;
+  bottom: 39%;
+  color: var(--jade);
+  box-shadow: 0 0 0 5px rgba(62, 217, 164, 0.08);
+}
+.bw-auth .pnl__doodle--cross {
+  width: 14px;
+  height: 14px;
+}
+.bw-auth .pnl__doodle--cross::before,
+.bw-auth .pnl__doodle--cross::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: -2px;
+  width: 1px;
+  height: 18px;
+  background: currentColor;
+}
+.bw-auth .pnl__doodle--cross::after {
+  transform: rotate(90deg);
+}
+.bw-auth .pnl__doodle--cross-one {
+  top: 47%;
+  right: 10%;
+  color: var(--jade);
+  transform: rotate(45deg);
+}
+.bw-auth .pnl__doodle--cross-two {
+  left: 24%;
+  bottom: 22%;
+  color: var(--amber);
+  transform: rotate(45deg) scale(0.65);
+}
+.bw-auth .pnl__doodle--arc {
+  top: 8%;
+  left: 14%;
+  width: 70px;
+  height: 28px;
+  border-top: 1px solid rgba(62, 217, 164, 0.5);
+  border-radius: 50%;
+  transform: rotate(-18deg);
+}
+.bw-auth .pnl__doodle--dash {
+  right: 27%;
+  bottom: 27%;
+  width: 30px;
+  height: 1px;
+  background: rgba(240, 166, 60, 0.5);
+  transform: rotate(-28deg);
+}
+.bw-auth .pnl__doodle--cluster {
+  top: 31%;
+  right: 25%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--jade);
+  box-shadow: 10px 5px 0 rgba(62, 217, 164, 0.55), 20px -2px 0 rgba(62, 217, 164, 0.35);
+}
+.bw-auth .pnl__doodle--diamond {
+  left: 31%;
+  top: 27%;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(240, 166, 60, 0.5);
+  transform: rotate(45deg);
+}
+.bw-auth .pnl__doodle--hatch {
+  right: 15%;
+  bottom: 18%;
+  width: 22px;
+  height: 14px;
+  opacity: 0.55;
+  background: repeating-linear-gradient(135deg, var(--amber) 0 1px, transparent 1px 6px);
+}
+.bw-auth .pnl__doodle--lower-arc {
+  left: 38%;
+  bottom: 12%;
+  width: 52px;
+  height: 20px;
+  border-bottom: 1px solid rgba(190, 225, 218, 0.3);
+  border-radius: 50%;
+  transform: rotate(9deg);
+}
+/* Panel ka har asal child gradient wash (::after, z-index 1) ke ooper aata
+   hai — magar canvas ko chhorna zaroori hai. `.pnl > *` aur `.pnl__waves` ki
+   specificity barabar hai, to bina :not() ke ye rule canvas ko position:
+   relative kar deta aur lehrein layout mein aa kar panel ko tor deti hain. */
+.bw-auth .pnl > *:not(.pnl__waves) {
+  position: relative;
+  z-index: 2;
+}
+
+.bw-auth .pnl__eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+.bw-auth .pnl h2 {
+  font-size: clamp(27px, 2.5vw, 36px);
+  font-variation-settings: "opsz" 110;
+  margin-top: 16px;
+  color: var(--ink-text);
+}
+.bw-auth .pnl h2 em {
+  font-style: italic;
+  color: var(--amber-lo);
+  font-variation-settings: "opsz" 144;
+}
+
+.bw-auth .pnl__card {
+  margin-top: auto;
+  border: 1px solid var(--ink-line);
+  background: rgba(190, 225, 218, 0.04);
+  border-radius: 18px;
+  padding: 20px 22px;
+  transition: border-color 0.22s ease, transform 0.22s ease;
+}
+.bw-auth .pnl__card:hover {
+  border-color: var(--ink-line-2);
+  transform: translateY(-2px);
+}
+.bw-auth .pnl__quote {
+  font-family: var(--f-display);
+  font-size: 16.5px;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--ink-text);
+}
+.bw-auth .pnl__by {
+  margin-top: 12px;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.bw-auth .pnl__stats {
+  display: flex;
+  gap: 26px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--ink-line);
+}
+.bw-auth .pnl__stat b {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--amber-lo);
+}
+.bw-auth .pnl__stat span {
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+
+/* ---------- centered single-column variant ---------- */
+.bw-auth .au--solo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  padding: clamp(24px, 5vw, 56px);
+  position: relative;
+  overflow: hidden;
+}
+.bw-auth .au--solo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(700px 420px at 50% -10%, var(--amber-glow), transparent 68%);
+}
+.bw-auth .au__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 470px;
+  background: var(--cream-hi);
+  border: 1px solid var(--cream-line);
+  border-radius: var(--r-lg);
+  padding: clamp(28px, 4vw, 44px);
+  box-shadow: 0 40px 80px -56px rgba(18, 32, 30, 0.55);
+  text-align: center;
+}
+.bw-auth .au__card .au__eyebrow {
+  justify-content: center;
+}
+.bw-auth .au__card .au__lede {
+  margin-inline: auto;
+}
+.bw-auth .au__mark {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 22px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--ink-2);
+  color: var(--amber);
+}
+.bw-auth .au__mark--amber {
+  background: var(--amber);
+  color: #1a1206;
+}
+.bw-auth .au__mark--rose {
+  background: var(--rose);
+  color: #fff;
+}
+.bw-auth .au__mail {
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--f-mono);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--cream-2);
+  border-radius: 999px;
+  padding: 5px 14px;
+  word-break: break-all;
+}
+
+/* ---------- confirmation / status blocks ----------
+   "Check your inbox", "link expired", "checking your link…" — ye screens form
+   ki jagah lete hain, is liye inhe cream column mein center karna parta hai.
+   `.au__card` (solo layout) khud center hai, lekin us ke andar bhi form fields
+   left-aligned rehni chahiye warna labels input ke ooper beech mein latak jati
+   hain. */
+.bw-auth .au__confirm {
+  text-align: center;
+}
+.bw-auth .au__confirm .au__eyebrow {
+  justify-content: center;
+}
+.bw-auth .au__confirm .au__title {
+  margin-top: 12px;
+}
+.bw-auth .au__confirm .au__lede {
+  margin-inline: auto;
+}
+.bw-auth .au__confirm .au__alert {
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
+.bw-auth .au__card form,
+.bw-auth .au__card .au__field {
+  text-align: left;
+}
+.bw-auth .au__card .au__brand {
+  margin-bottom: 22px;
+}
+
+/* solo card ke andar mark chhota rakhein — heading ke saath bhaari na lage */
+.bw-auth .au__card .au__mark {
+  width: 50px;
+  height: 50px;
+}
+
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .bw-auth *,
+  .bw-auth *::before,
+  .bw-auth *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,1877 @@
+/* ============================================================
+   BrandWave — dashboard theme (paper / ink / orange)
+   ------------------------------------------------------------
+   Reference: reference.jpeg (SEO Intelligence screen).
+   Teen rang, aur bas: BLACK (ink + sidebar), WHITE (paper cards
+   par ek halke warm ground) aur ORANGE (#f0a63c) — sirf ek
+   accent. Koi jade/rose, koi gradient, koi glow, koi animated
+   canvas. Professional aur minimal.
+
+   Har selector `.bw-dash` ke neeche scoped hai. Ye optional nahi:
+   app/globals.css Tailwind import karti hai aur baqi dashboard
+   pages abhi bhi purane light Tailwind par hain. Scope hatane par
+   woh saare pages bhi badal jayenge. Isi wajah se har class
+   `dsh__` / `scr__` se prefixed hai — kabhi kisi Tailwind utility
+   se na takraye.
+
+   Sidebar (components/dashboard/Sidebar.tsx) is file ka hissa
+   NAHI hai — wo apni Tailwind classes par hai aur pure black
+   rehta hai; sirf uska active pill orange kiya gaya hai taake
+   reference se match kare.
+   ============================================================ */
+
+.bw-dash {
+  /* ground + paper */
+  --ground: #f7f6f2;
+  --paper: #ffffff;
+  --paper-2: #fbfaf7;
+  --line: #e7e4dc;
+  --line-2: #d5d1c6;
+
+  /* ink */
+  --ink: #0a0a0a;
+  --ink-2: #16160f;
+
+  /* text on paper */
+  --text: #14140f;
+  --text-dim: #56544d;
+  --text-mute: #8b877d;
+
+  /* the one accent */
+  --amber: #f0a63c;
+  --amber-deep: #a8620d;
+  --amber-tint: #fdf4e6;
+  --amber-line: #f2d6a6;
+
+  --f-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --f-body: var(--font-instrument-sans), "Helvetica Neue", Arial, sans-serif;
+  --f-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  min-height: 100vh;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.bw-dash *,
+.bw-dash *::before,
+.bw-dash *::after {
+  box-sizing: border-box;
+}
+.bw-dash h1,
+.bw-dash h2,
+.bw-dash h3,
+.bw-dash h4 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: inherit;
+}
+.bw-dash p {
+  margin: 0;
+}
+/*
+ * Reset — MAGAR Tailwind ke utilities ko na kha jaye.
+ *
+ * MASLA jo ye hal karta hai: ye file bina kisi @layer ke import hoti hai, aur
+ * unlayered CSS Tailwind ki layered utilities ko HAMESHA harata hai — chahe
+ * specificity kuch bhi ho. Natija ye tha ke `.bw-dash` ke andar:
+ *
+ *   * har <button class="bg-[#f0a63c]"> ka background gayab (background:none)
+ *     — video ad ka "Write the prompt for me" button isi wajah se be-rang tha
+ *   * har <a class="text-white"> ka safed rang gayab (color:inherit)
+ *     — gallery ka "+ New Video Ad" kaale button par KAALA text ban gaya tha,
+ *       yani bilkul nazar hi nahi aata
+ *
+ * Hal: reset sirf un elements par lage jinhone khud rang tay nahi kiya. Jis
+ * par Tailwind ki `bg-` ya `text-` wali class mojood hai, us ko chhor do.
+ */
+.bw-dash a {
+  text-decoration: none;
+}
+.bw-dash a:not([class*="text-"]) {
+  color: inherit;
+}
+.bw-dash button {
+  font: inherit;
+  border: 0;
+  cursor: pointer;
+}
+.bw-dash button:not([class*="text-"]) {
+  color: inherit;
+}
+.bw-dash button:not([class*="bg-"]) {
+  background: none;
+}
+.bw-dash :focus-visible {
+  outline: 2px solid var(--amber-deep);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- shell ---------- */
+.bw-dash .dsh {
+  flex: 1;
+  min-width: 0;
+  transition: margin 0.3s ease;
+}
+
+/* Page header — reference ka top block: serif title + gray sub,
+   right par actions. Sticky taake lambi tables par context na khoye. */
+.bw-dash .dsh__top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px clamp(18px, 3vw, 34px);
+  background: color-mix(in srgb, var(--ground) 90%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.bw-dash .dsh__top h1 {
+  font-size: 24px;
+  font-variation-settings: "opsz" 48;
+}
+.bw-dash .dsh__sub {
+  margin-top: 3px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+.bw-dash .dsh__topactions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.bw-dash .dsh__body {
+  padding: clamp(20px, 3vw, 30px);
+  max-width: 1180px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ---------- primitives ---------- */
+.bw-dash .dsh__eyebrow {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.bw-dash .dsh__card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.bw-dash .dsh__cardhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.bw-dash .dsh__cardhead h3 {
+  font-size: 16px;
+  font-variation-settings: "opsz" 30;
+}
+
+/* Status pill — reference ka "Audit score 61 / 100". */
+.bw-dash .dsh__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--amber-line);
+  background: var(--amber-tint);
+  color: var(--amber-deep);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Buttons — 8px radius, minimal. Orange sirf primary action par. */
+.bw-dash .dsh__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.bw-dash .dsh__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.bw-dash .dsh__btn--amber {
+  background: var(--amber);
+  color: #1a1206;
+}
+.bw-dash .dsh__btn--amber:hover:not(:disabled) {
+  background: #e59a2c;
+}
+.bw-dash .dsh__btn--ink {
+  background: var(--ink);
+  color: #fff;
+}
+.bw-dash .dsh__btn--ink:hover:not(:disabled) {
+  background: #26261c;
+}
+.bw-dash .dsh__btn--ghost {
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  color: var(--text);
+}
+.bw-dash .dsh__btn--ghost:hover:not(:disabled) {
+  border-color: var(--ink);
+}
+.bw-dash .dsh__btn--sm {
+  padding: 8px 13px;
+  font-size: 12.5px;
+}
+
+.bw-dash .dsh__link {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.18s ease;
+}
+.bw-dash .dsh__link:hover {
+  border-bottom-color: currentColor;
+}
+
+.bw-dash .dsh__spin {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: dsh-spin 0.7s linear infinite;
+  flex: none;
+}
+@keyframes dsh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- stat tiles (reference ka top row) ---------- */
+.bw-dash .dsh__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.bw-dash .dsh__stat {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 20px 20px;
+}
+.bw-dash .dsh__stat span {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.bw-dash .dsh__stat strong {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--f-display);
+  font-size: 34px;
+  font-weight: 600;
+  font-variation-settings: "opsz" 60;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.bw-dash .dsh__stat small {
+  display: block;
+  margin-top: 7px;
+  font-size: 12px;
+  color: var(--ink);
+}
+@media (max-width: 860px) {
+  .bw-dash .dsh__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .bw-dash .dsh__stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ============================================================
+   SCRAPING — start form + progress + options + history
+   ============================================================ */
+
+/* Pehle yahan animated WaveCanvas + amber/jade radial glows wala
+   dark hero tha. Reference minimal hai, is liye ab wohi ek saada
+   white card hai jis ka kaam sirf URL lena hai. */
+.bw-dash .scr__start {
+  padding: clamp(20px, 2.6vw, 28px);
+}
+.bw-dash .scr__start .dsh__eyebrow {
+  color: var(--ink);
+}
+.bw-dash .scr__start h2 {
+  margin-top: 10px;
+  font-size: 20px;
+  font-variation-settings: "opsz" 40;
+}
+.bw-dash .scr__lede {
+  margin-top: 8px;
+  max-width: 62ch;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.bw-dash .scr__form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+.bw-dash .scr__field {
+  flex: 1;
+  min-width: 0;
+}
+.bw-dash .scr__field label {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.bw-dash .scr__input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 13px;
+  height: 42px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--paper-2);
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+.bw-dash .scr__input:focus-within {
+  border-color: var(--ink);
+  background: var(--paper);
+}
+.bw-dash .scr__input svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--text-mute);
+}
+.bw-dash .scr__input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+}
+.bw-dash .scr__input input::placeholder {
+  color: var(--ink);
+}
+.bw-dash .scr__form .dsh__btn {
+  height: 42px;
+  flex: none;
+}
+@media (max-width: 640px) {
+  .bw-dash .scr__form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.bw-dash .scr__error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 13px;
+  border: 1px solid var(--line-2);
+  border-left: 3px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper-2);
+  font-size: 13px;
+  color: var(--text);
+}
+.bw-dash .scr__error svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+/* Info pills — saada mono text, hairline border, koi rang nahi. */
+.bw-dash .scr__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.bw-dash .scr__pill {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+  background: var(--amber-tint);
+  border: 1px solid var(--amber-line);
+  border-radius: 999px;
+  padding: 5px 11px;
+}
+
+/* ---------- progress ---------- */
+.bw-dash .scr__prog {
+  padding: clamp(18px, 2.2vw, 24px);
+}
+.bw-dash .scr__proghead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+}
+.bw-dash .scr__proghead h3 {
+  font-size: 16px;
+}
+.bw-dash .scr__pct {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber-deep);
+}
+.bw-dash .scr__bar {
+  height: 5px;
+  margin: 14px 0 18px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.bw-dash .scr__barfill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--amber);
+}
+.bw-dash .scr__stage {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.bw-dash .scr__stage--now {
+  color: var(--text);
+  font-weight: 600;
+}
+.bw-dash .scr__stage--done {
+  color: var(--ink);
+}
+.bw-dash .scr__dot {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  color: var(--ink);
+}
+.bw-dash .scr__stage--done .scr__dot {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.bw-dash .scr__stage--now .scr__dot {
+  border-color: var(--amber);
+}
+.bw-dash .scr__pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--amber);
+}
+
+/* ---------- what we pull ---------- */
+.bw-dash .scr__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.bw-dash .scr__opt {
+  padding: 18px 20px 20px;
+  border-right: 1px solid var(--line);
+}
+.bw-dash .scr__opt:last-child {
+  border-right: 0;
+}
+.bw-dash .scr__optn {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+.bw-dash .scr__opticon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: 12px 0 12px;
+  border-radius: 7px;
+  border: 1px solid var(--amber-line);
+  background: var(--amber-tint);
+  color: var(--amber-deep);
+}
+.bw-dash .scr__opticon svg {
+  width: 16px;
+  height: 16px;
+}
+.bw-dash .scr__opt h4 {
+  margin: 0 0 5px;
+  font-family: var(--f-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.bw-dash .scr__opt p {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+@media (max-width: 900px) {
+  .bw-dash .scr__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bw-dash .scr__opt:nth-child(2n) {
+    border-right: 0;
+  }
+  .bw-dash .scr__opt:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--line);
+  }
+}
+@media (max-width: 520px) {
+  .bw-dash .scr__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bw-dash .scr__opt {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .bw-dash .scr__opt:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* ---------- history table ---------- */
+.bw-dash .scr__tablewrap {
+  overflow-x: auto;
+}
+.bw-dash .scr__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.bw-dash .scr__table th {
+  padding: 11px 20px;
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.bw-dash .scr__table td {
+  padding: 14px 20px;
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.bw-dash .scr__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.bw-dash .scr__table tbody tr:hover {
+  background: var(--paper-2);
+}
+.bw-dash .scr__site {
+  font-weight: 600;
+  color: var(--text);
+}
+.bw-dash .scr__brand {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--ink);
+}
+.bw-dash .scr__count {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.bw-dash .scr__status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--paper-2);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* ---------- empty ---------- */
+.bw-dash .scr__empty {
+  padding: 44px 20px 48px;
+  text-align: center;
+}
+.bw-dash .scr__emptymark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  color: var(--text-mute);
+}
+.bw-dash .scr__empty h4 {
+  font-family: var(--f-body);
+  font-size: 14px;
+  font-weight: 600;
+}
+.bw-dash .scr__empty p {
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+/* ---------- safety note ---------- */
+.bw-dash .scr__safety {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 20px;
+  border-top: 1px solid var(--line);
+  background: var(--paper-2);
+}
+.bw-dash .scr__safety svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--text-mute);
+}
+.bw-dash .scr__safety p {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+@media (max-width: 640px) {
+  .bw-dash .scr__safety {
+    flex-wrap: wrap;
+  }
+  .bw-dash .scr__safety p {
+    flex-basis: 100%;
+  }
+}
+
+/* ============================================================
+   BRAND PROFILE — identity + tabs + overview + products + social
+   ------------------------------------------------------------
+   Pehle ye page apni Tailwind duniya me tha: black gradient-grid
+   hero, blue/green/purple/orange gradient chips aur har jagah
+   emoji. Ab wohi teen rang — koi gradient nahi, koi emoji nahi.
+   ============================================================ */
+
+/* 4-up stat row (profile me chaar tiles hain, scraping me teen). */
+.bw-dash .dsh__stats--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 900px) {
+  .bw-dash .dsh__stats--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .bw-dash .dsh__stats--4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- identity card ---------- */
+.bw-dash .prf__id {
+  padding: clamp(20px, 2.6vw, 26px);
+}
+.bw-dash .prf__idtop {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.bw-dash .prf__mark {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff;
+  font-family: var(--f-display);
+  font-size: 20px;
+  font-weight: 600;
+}
+.bw-dash .prf__idmain {
+  flex: 1;
+  min-width: 0;
+}
+.bw-dash .prf__idname {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+.bw-dash .prf__idname h2 {
+  font-size: 24px;
+  font-variation-settings: "opsz" 48;
+}
+.bw-dash .prf__desc {
+  margin-top: 8px;
+  max-width: 70ch;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.bw-dash .prf__url {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--amber-deep);
+  border-bottom: 1px solid transparent;
+}
+.bw-dash .prf__url:hover {
+  border-bottom-color: currentColor;
+}
+.bw-dash .prf__url svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+/* Neutral capsule — platform, price range, business type. Koi rang nahi. */
+.bw-dash .prf__tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--paper-2);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.bw-dash .prf__tag--category {
+  border-color: var(--amber-line);
+  background: var(--amber-tint);
+  color: var(--amber-deep);
+}
+.bw-dash .prf__sectionhead {
+  background: var(--ink);
+  color: #fff;
+  border-bottom-color: var(--ink);
+}
+
+/* Profile supporting text stays readable against the paper background. */
+.bw-dash.prf .dsh__sub,
+.bw-dash.prf .prf__tab,
+.bw-dash.prf .prf__body p,
+.bw-dash.prf .prf__note,
+.bw-dash.prf .prf__pagen,
+.bw-dash.prf .prf__socurl,
+.bw-dash.prf .prf__form label {
+  color: var(--ink);
+}
+.bw-dash.prf .prf__tab--on,
+.bw-dash.prf .prf__tab--on:hover {
+  color: #fff;
+}
+
+/* ---------- tabs ---------- */
+.bw-dash .prf__tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  align-self: flex-start;
+  flex-wrap: wrap;
+}
+.bw-dash .prf__tab {
+  padding: 8px 15px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.bw-dash .prf__tab:hover {
+  color: var(--text);
+}
+/* Selected = ink. Orange yahan jaan boojh kar nahi: chips/tabs bohat
+   hain, orange ko sirf primary action aur accent ke liye bachaya hai. */
+.bw-dash .prf__tab--on {
+  background: var(--ink);
+  color: #fff;
+}
+.bw-dash .prf__tab--on:hover {
+  color: #fff;
+}
+.bw-dash .prf__tabn {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  opacity: 0.75;
+  margin-left: 4px;
+}
+
+/* ---------- overview grid ---------- */
+.bw-dash .prf__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .bw-dash .prf__cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.bw-dash .prf__span {
+  grid-column: 1 / -1;
+}
+.bw-dash .prf__body {
+  padding: 18px 20px 20px;
+  color: var(--ink);
+}
+.bw-dash .prf__body p {
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+
+/* key / value rows */
+.bw-dash .prf__kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+}
+.bw-dash .prf__kv:last-child {
+  border-bottom: 0;
+}
+.bw-dash .prf__kvk {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* market editor */
+.bw-dash .prf__market {
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+.bw-dash .prf__markethead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13.5px;
+}
+.bw-dash .prf__flag {
+  margin-left: 7px;
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+}
+.bw-dash .prf__select {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 11px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--paper);
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+}
+.bw-dash .prf__select:focus {
+  outline: 0;
+  border-color: var(--ink);
+}
+.bw-dash .prf__note {
+  margin-top: 8px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--text-mute);
+}
+.bw-dash .prf__rowbtns {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* ---------- category chips ---------- */
+.bw-dash .prf__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.bw-dash .prf__chip {
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--paper);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--amber-deep);
+  background: var(--amber-tint);
+  border-color: var(--amber-line);
+  text-transform: capitalize;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+.bw-dash .prf__chip:hover:not(:disabled) {
+  border-color: var(--amber-deep);
+  color: var(--amber-deep);
+}
+.bw-dash .prf__chip--on {
+  background: var(--amber);
+  border-color: var(--amber-deep);
+  color: var(--ink);
+}
+.bw-dash .prf__chip--on:hover:not(:disabled) {
+  color: var(--ink);
+}
+.bw-dash .prf__chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.bw-dash .prf__chipn {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  opacity: 0.7;
+  margin-left: 3px;
+}
+
+/* ---------- products ---------- */
+.bw-dash .prf__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 1100px) {
+  .bw-dash .prf__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 860px) {
+  .bw-dash .prf__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .bw-dash .prf__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.bw-dash .prf__prod {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  overflow: hidden;
+  transition: border-color 0.18s ease;
+}
+.bw-dash .prf__prod:hover {
+  border-color: var(--line-2);
+}
+.bw-dash .prf__prodimg {
+  height: 200px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: var(--text-mute);
+  overflow: hidden;
+}
+.bw-dash .prf__prodimg img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.bw-dash .prf__prodbody {
+  padding: 11px 12px 12px;
+}
+.bw-dash .prf__prodname {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.bw-dash .prf__prodfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 9px;
+}
+.bw-dash .prf__price {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Lambi price (PKR 48,000) do lines me tut rahi thi aur tag ko dhakel deti
+   thi — price ek line par, category zaroorat par ellipsis. */
+.bw-dash .prf__prodfoot .prf__price {
+  white-space: nowrap;
+  flex: none;
+}
+.bw-dash .prf__prodfoot .prf__tag {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* pagination */
+.bw-dash .prf__pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+.bw-dash .prf__pagen {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  color: var(--text-mute);
+}
+.bw-dash .prf__pagen b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ---------- social ---------- */
+.bw-dash .prf__social {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 900px) {
+  .bw-dash .prf__social {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .bw-dash .prf__social {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.bw-dash .prf__soc {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  transition: border-color 0.18s ease;
+}
+.bw-dash .prf__soc:hover {
+  border-color: var(--ink);
+}
+.bw-dash .prf__socico {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+  color: var(--ink);
+}
+.bw-dash .prf__socico svg {
+  width: 17px;
+  height: 17px;
+}
+.bw-dash .prf__socmain {
+  flex: 1;
+  min-width: 0;
+}
+.bw-dash .prf__socname {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.bw-dash .prf__socurl {
+  font-size: 12px;
+  color: var(--text-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bw-dash .prf__socout {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: var(--text-mute);
+}
+/* ---------- platform brand colours ---------- */
+/*
+ * Har card apne platform ke ASAL brand rang par. Pehle sirf teen (youtube,
+ * instagram, facebook) branded thay aur baqi paanch saade kaghazi card rehte
+ * the — list adhoori aur be-tarteeb lagti thi.
+ *
+ * Rang har platform ki apni brand guideline se liye gaye hain:
+ *   facebook  #1877f2   youtube   #ff0000   whatsapp  #25d366
+ *   linkedin  #0a66c2   pinterest #e60023   x/twitter #000000
+ *   tiktok    #010101 (cyan #69c9d0 + pink #ee1d52 accent)
+ *   instagram apna mashhoor gradient
+ *
+ * Har rang ke saath safed text/icon — isi liye border thora gehra rakha hai,
+ * warna halke background par card apne kinare kho deta.
+ */
+.bw-dash .prf__soc--facebook {
+  background: #1877f2;
+  border-color: #125dcc;
+}
+.bw-dash .prf__soc--youtube {
+  background: #ff0000;
+  border-color: #d90000;
+}
+.bw-dash .prf__soc--whatsapp {
+  background: #25d366;
+  border-color: #1da851;
+}
+.bw-dash .prf__soc--linkedin {
+  background: #0a66c2;
+  border-color: #08529b;
+}
+/* Pinterest: laal + safed — logo wahi do rang istemal karta hai. */
+.bw-dash .prf__soc--pinterest {
+  background: #e60023;
+  border-color: #bd001d;
+}
+/* X ab kaala hai (purana neela parinda nahi raha). */
+.bw-dash .prf__soc--twitter {
+  background: #000;
+  border-color: #2b2b2b;
+}
+.bw-dash .prf__soc--tiktok {
+  background: #010101;
+  border-color: #2b2b2b;
+}
+.bw-dash .prf__soc--instagram {
+  background: linear-gradient(135deg, #feda75 0%, #fa7e1e 25%, #d62976 55%, #962fbf 78%, #4f5bd5 100%);
+  border-color: #d62976;
+}
+
+.bw-dash .prf__soc--facebook,
+.bw-dash .prf__soc--youtube,
+.bw-dash .prf__soc--whatsapp,
+.bw-dash .prf__soc--linkedin,
+.bw-dash .prf__soc--pinterest,
+.bw-dash .prf__soc--twitter,
+.bw-dash .prf__soc--tiktok,
+.bw-dash .prf__soc--instagram {
+  color: #fff;
+}
+
+/* Hover par border ko ink karna rangeen card par nazar hi nahi aata —
+   is liye halka sa ubhaar aur roshni. */
+.bw-dash .prf__soc--facebook:hover,
+.bw-dash .prf__soc--youtube:hover,
+.bw-dash .prf__soc--whatsapp:hover,
+.bw-dash .prf__soc--linkedin:hover,
+.bw-dash .prf__soc--pinterest:hover,
+.bw-dash .prf__soc--twitter:hover,
+.bw-dash .prf__soc--tiktok:hover,
+.bw-dash .prf__soc--instagram:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.bw-dash .prf__soc--facebook .prf__socico,
+.bw-dash .prf__soc--youtube .prf__socico,
+.bw-dash .prf__soc--whatsapp .prf__socico,
+.bw-dash .prf__soc--linkedin .prf__socico,
+.bw-dash .prf__soc--pinterest .prf__socico,
+.bw-dash .prf__soc--twitter .prf__socico,
+.bw-dash .prf__soc--tiktok .prf__socico,
+.bw-dash .prf__soc--instagram .prf__socico {
+  border-color: rgb(255 255 255 / 45%);
+  background: rgb(255 255 255 / 16%);
+  color: #fff;
+}
+
+/* TikTok ka apna cyan/pink — kaale card par yehi us ki pehchan hai, aur X ke
+   kaale card se farq bhi isi se aata hai. */
+.bw-dash .prf__soc--tiktok .prf__socico {
+  background: linear-gradient(135deg, #69c9d0 0%, #010101 55%, #ee1d52 100%);
+  border-color: rgb(255 255 255 / 30%);
+}
+
+.bw-dash .prf__soc--facebook .prf__socurl,
+.bw-dash .prf__soc--youtube .prf__socurl,
+.bw-dash .prf__soc--whatsapp .prf__socurl,
+.bw-dash .prf__soc--linkedin .prf__socurl,
+.bw-dash .prf__soc--pinterest .prf__socurl,
+.bw-dash .prf__soc--twitter .prf__socurl,
+.bw-dash .prf__soc--tiktok .prf__socurl,
+.bw-dash .prf__soc--instagram .prf__socurl,
+.bw-dash .prf__soc--facebook .prf__socout,
+.bw-dash .prf__soc--youtube .prf__socout,
+.bw-dash .prf__soc--whatsapp .prf__socout,
+.bw-dash .prf__soc--linkedin .prf__socout,
+.bw-dash .prf__soc--pinterest .prf__socout,
+.bw-dash .prf__soc--twitter .prf__socout,
+.bw-dash .prf__soc--tiktok .prf__socout,
+.bw-dash .prf__soc--instagram .prf__socout {
+  color: rgb(255 255 255 / 88%);
+}
+
+/* ---------- edit form ---------- */
+.bw-dash .prf__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+@media (max-width: 700px) {
+  .bw-dash .prf__form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.bw-dash .prf__wide {
+  grid-column: 1 / -1;
+}
+.bw-dash .prf__form label {
+  display: block;
+  margin-bottom: 7px;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.bw-dash .prf__form input,
+.bw-dash .prf__form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--paper-2);
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  resize: none;
+}
+.bw-dash .prf__form input:focus,
+.bw-dash .prf__form textarea:focus {
+  outline: 0;
+  border-color: var(--ink);
+  background: var(--paper);
+}
+.bw-dash .prf__formfoot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* ---------- banner / states ---------- */
+.bw-dash .prf__banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 15px;
+  border: 1px solid var(--line-2);
+  border-left: 3px solid var(--ink);
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 13px;
+}
+.bw-dash .prf__bannerx {
+  color: var(--text-mute);
+  font-size: 16px;
+  line-height: 1;
+}
+.bw-dash .prf__bannerx:hover {
+  color: var(--text);
+}
+.bw-dash .prf__blank {
+  padding: 52px 20px 56px;
+  text-align: center;
+  border: 1px dashed var(--line-2);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.bw-dash .prf__blank h4 {
+  font-family: var(--f-body);
+  font-size: 14px;
+  font-weight: 600;
+}
+.bw-dash .prf__blank p {
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.bw-dash .prf__blank button {
+  margin-top: 12px;
+}
+
+/* Full-page loader — Suspense fallback aur initial fetch dono ke liye. */
+.bw-dash-boot {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  background: #f7f6f2;
+}
+.bw-dash-boot span {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 2px solid #0a0a0a;
+  border-top-color: transparent;
+  animation: dsh-spin 0.7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bw-dash * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================================
+   SHARED COMPONENT LAYER
+   ------------------------------------------------------------
+   Yahan tak dash.css mein sirf woh cheezein thin jo scraping ko
+   chahiye thin (dsh__ core + scr__ layer). Baqi pages purane
+   ad-hoc Tailwind par thay - isi liye SEO aur Ads dekh kar
+   scraping se ALAG lagte thay.
+
+   Ye layer wohi tokens use karti hai (paper / ink / amber, wohi
+   teen fonts) aur un patterns ko naam deti hai jo har module ko
+   chahiye: section headers, meters, tables, badges, empty states,
+   module cards. Nayi page migrate karte waqt yahan se class lo -
+   nayi CSS likhne ki zaroorat kam hi parni chahiye.
+
+   scr__* jaan boojh kar chhora gaya hai: scraping pages usi par
+   chal rahe hain aur unhein todna is kaam ka hissa nahi.
+   ============================================================ */
+
+/* ---------- section: eyebrow + title + optional action ---------- */
+.bw-dash .dsh__section {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 14px 2px 0;
+}
+.bw-dash .dsh__section h2 {
+  font-size: 19px;
+  font-variation-settings: "opsz" 40;
+}
+.bw-dash .dsh__section .dsh__eyebrow {
+  margin-bottom: 6px;
+}
+.bw-dash .dsh__sectionnote {
+  font-size: 12.5px;
+  color: var(--text-mute);
+  margin-top: 4px;
+}
+
+/* ---------- grids ---------- */
+.bw-dash .dsh__grid {
+  display: grid;
+  gap: 14px;
+}
+.bw-dash .dsh__grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.bw-dash .dsh__grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.bw-dash .dsh__grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.bw-dash .dsh__stats--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 980px) {
+  .bw-dash .dsh__grid--3,
+  .bw-dash .dsh__grid--4,
+  .bw-dash .dsh__stats--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .bw-dash .dsh__grid--2,
+  .bw-dash .dsh__grid--3,
+  .bw-dash .dsh__grid--4,
+  .bw-dash .dsh__stats--4 { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- hero: ink panel, sirf module ke sab se ahem number ke liye ----------
+   Ye poore page par EK dafa. Reference minimal hai; do ink panels
+   ek page par rakhne se "premium" nahi, shor banta hai. */
+.bw-dash .dsh__hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(22px, 4vw, 46px);
+  padding: clamp(24px, 3.4vw, 38px);
+  border-radius: 14px;
+  background: var(--ink);
+  color: #f4f2ec;
+  border: 1px solid var(--ink);
+}
+.bw-dash .dsh__hero h2 {
+  color: #fff;
+  font-size: clamp(21px, 2.4vw, 27px);
+  font-variation-settings: "opsz" 48;
+}
+.bw-dash .dsh__herometa {
+  margin-top: 7px;
+  font-size: 13px;
+  color: #a8a49a;
+}
+.bw-dash .dsh__herofoot {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 26px;
+}
+.bw-dash .dsh__herostat span {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8d8a80;
+}
+.bw-dash .dsh__herostat strong {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--f-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  color: #fff;
+}
+@media (max-width: 720px) {
+  .bw-dash .dsh__hero { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+}
+
+/* ---------- score ring ---------- */
+.bw-dash .dsh__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.bw-dash .dsh__ring svg { display: block; transform: rotate(-90deg); }
+.bw-dash .dsh__ringval {
+  position: absolute;
+  text-align: center;
+  line-height: 1;
+}
+.bw-dash .dsh__ringval b {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 40px;
+  font-weight: 600;
+  font-variation-settings: "opsz" 60;
+  letter-spacing: -0.02em;
+}
+.bw-dash .dsh__ringval span {
+  display: block;
+  margin-top: 5px;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  opacity: 0.62;
+}
+
+/* ---------- meter: ek factor ka score ---------- */
+.bw-dash .dsh__meter + .dsh__meter { margin-top: 15px; }
+.bw-dash .dsh__meterhead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+.bw-dash .dsh__meterhead span { font-size: 13px; color: var(--text-dim); }
+.bw-dash .dsh__meterhead b {
+  font-family: var(--f-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+.bw-dash .dsh__metertrack {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.bw-dash .dsh__meterfill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ink);
+  transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.bw-dash .dsh__meterfill--amber { background: var(--amber); }
+/* Ink panel ke andar meter - track ko halka karna parta hai. */
+.bw-dash .dsh__hero .dsh__metertrack { background: rgba(255, 255, 255, 0.14); }
+.bw-dash .dsh__hero .dsh__meterhead span { color: #a8a49a; }
+.bw-dash .dsh__hero .dsh__meterhead b { color: #fff; }
+.bw-dash .dsh__hero .dsh__meterfill { background: var(--amber); }
+
+/* ---------- badges ---------- */
+.bw-dash .dsh__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  background: var(--paper-2);
+  color: var(--text-dim);
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.bw-dash .dsh__badge--good {
+  border-color: #bcd8c8; background: #eaf4ee; color: #1c6c4b;
+}
+.bw-dash .dsh__badge--warn {
+  border-color: var(--amber-line); background: var(--amber-tint); color: var(--amber-deep);
+}
+.bw-dash .dsh__badge--bad {
+  border-color: #e6c3c8; background: #fbeaec; color: #a3243a;
+}
+.bw-dash .dsh__badge--ink {
+  border-color: var(--ink); background: var(--ink); color: #fff;
+}
+
+/* ---------- table ---------- */
+.bw-dash .dsh__tablewrap { overflow-x: auto; }
+.bw-dash .dsh__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.bw-dash .dsh__table th {
+  padding: 11px 20px;
+  text-align: left;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.bw-dash .dsh__table td {
+  padding: 13px 20px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  color: var(--text-dim);
+}
+.bw-dash .dsh__table tbody tr:last-child td { border-bottom: 0; }
+.bw-dash .dsh__table tbody tr:hover td { background: var(--paper-2); }
+.bw-dash .dsh__table td b { color: var(--text); font-weight: 600; }
+.bw-dash .dsh__num {
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ---------- list row (table ka narrow bhai) ---------- */
+.bw-dash .dsh__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.bw-dash .dsh__row:last-child { border-bottom: 0; }
+.bw-dash .dsh__row:hover { background: var(--paper-2); }
+.bw-dash .dsh__rowmain { min-width: 0; }
+.bw-dash .dsh__rowmain b {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bw-dash .dsh__rowmain span {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--text-mute);
+}
+.bw-dash .dsh__rowactions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+/* ---------- module card: module ke andar navigation ---------- */
+.bw-dash .dsh__mod {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.bw-dash a.dsh__mod:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+}
+.bw-dash .dsh__modtop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.bw-dash .dsh__mod h3 {
+  font-size: 15.5px;
+  font-variation-settings: "opsz" 28;
+}
+.bw-dash .dsh__mod p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+.bw-dash .dsh__modgo {
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--amber-deep);
+}
+
+/* ---------- key/value ---------- */
+.bw-dash .dsh__kv {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 13.5px;
+}
+.bw-dash .dsh__kv:last-child { border-bottom: 0; }
+.bw-dash .dsh__kv dt { color: var(--text-mute); }
+.bw-dash .dsh__kv dd { font-family: var(--f-mono); font-size: 12.5px; color: var(--text); }
+
+/* ---------- empty state ---------- */
+.bw-dash .dsh__empty {
+  display: grid;
+  place-items: center;
+  gap: 9px;
+  padding: clamp(38px, 6vw, 66px) 24px;
+  text-align: center;
+}
+.bw-dash .dsh__emptymark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px dashed var(--line-2);
+  color: var(--text-mute);
+  margin-bottom: 2px;
+}
+.bw-dash .dsh__empty h3 { font-size: 16px; font-variation-settings: "opsz" 30; }
+.bw-dash .dsh__empty p {
+  font-size: 13.5px;
+  color: var(--text-mute);
+  max-width: 40ch;
+  line-height: 1.6;
+}
+
+/* ---------- inline note ---------- */
+.bw-dash .dsh__note {
+  display: flex;
+  gap: 10px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--amber-line);
+  background: var(--amber-tint);
+  font-size: 13px;
+  color: var(--amber-deep);
+  line-height: 1.55;
+}
+
+/* Nakami ka note - wohi shakl, rose tokens par. Pehle har page apna
+   ErrorBanner (Tailwind) render karta tha, jo is palette se bahar tha. */
+.bw-dash .dsh__note--bad {
+  border-color: #e6c3c8;
+  background: #fbeaec;
+  color: #a3243a;
+}
+
+/* ---------- skeleton ---------- */
+.bw-dash .dsh__skel {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--line) 25%, var(--paper-2) 50%, var(--line) 75%);
+  background-size: 200% 100%;
+  animation: dsh-shimmer 1.3s ease-in-out infinite;
+}
+@keyframes dsh-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* ---------- prose: blog article body ---------- */
+.bw-dash .dsh__prose {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-dim);
+  max-width: 68ch;
+}
+.bw-dash .dsh__prose h2 {
+  margin: 26px 0 10px;
+  font-size: 19px;
+  color: var(--text);
+  font-variation-settings: "opsz" 40;
+}
+.bw-dash .dsh__prose h3 {
+  margin: 20px 0 8px;
+  font-size: 16px;
+  color: var(--text);
+  font-variation-settings: "opsz" 30;
+}
+.bw-dash .dsh__prose p { margin: 0 0 13px; }
+.bw-dash .dsh__prose ul, .bw-dash .dsh__prose ol { margin: 0 0 13px 20px; }
+.bw-dash .dsh__prose li { margin: 0 0 6px; }
+.bw-dash .dsh__prose strong { color: var(--text); font-weight: 600; }
+
+/* ---------- tabs ---------- */
+.bw-dash .dsh__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  overflow-x: auto;
+}
+.bw-dash .dsh__tab {
+  flex: 1 1 auto;
+  padding: 9px 16px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-mute);
+  white-space: nowrap;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.bw-dash .dsh__tab:hover { color: var(--text); background: var(--paper-2); }
+.bw-dash .dsh__tab--on {
+  background: var(--ink);
+  color: #fff;
+}
+.bw-dash .dsh__tab--on:hover { background: var(--ink); color: #fff; }
+
+
+/* ── Sentiment: "Include YouTube reviewers" opt-in ────────────────────
+   Ye source mehnga hai (~121 YouTube quota units + ~3 minute), is liye
+   checkbox hai aur waqt saaf likha hai. Aage ye paid plan ka hissa hoga. */
+.snt__deep {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px;
+  border: 1px solid var(--dsh-line, rgba(255, 255, 255, 0.14));
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--dsh-text-dim, #9aa7a4);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.snt__deep:hover {
+  border-color: rgba(240, 166, 60, 0.5);
+  color: var(--dsh-text, #e9f3f0);
+}
+.snt__deep input {
+  accent-color: #f0a63c;
+  cursor: pointer;
+  margin: 0;
+}
+.snt__deep em {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f0a63c;
+}
+.snt__deep:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

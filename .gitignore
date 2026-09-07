@@ -1,0 +1,160 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+# ...but the keys-only templates MUST be committed, warna koi setup nahi kar sakta.
+!.env.example
+!backend/.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+logs/
+# Account cleanup backups contain real user rows — never commit them.
+backend/scripts/cleanup_backup_*.json
+backend/scripts/full_reset_backup_*.json
+
+# Brand-merge backups contain real user rows — never commit them.
+backend/scripts/merge_backup_*.json
+
+# ─────────────────────────────────────────────────────────────────────────
+# Deployment / hackathon hardening
+# ─────────────────────────────────────────────────────────────────────────
+
+# ── Secrets ──────────────────────────────────────────────────────────────
+# `.env*` upar pehle se hai aur wo backend/.env ko bhi cover karta hai
+# (leading slash na hone ki wajah se pattern har level par lagta hai).
+# Ye baqi shaklein hain jo aksar reh jati hain:
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
+id_rsa
+id_rsa.pub
+*.ppk
+
+# AWS ke apne credentials — kabhi repo mein nahi.
+.aws/
+aws-credentials*
+*.aws.json
+
+# Service-account / OAuth JSON (Google, Firebase waghera)
+service-account*.json
+client_secret*.json
+gcp-*.json
+firebase-adminsdk*.json
+
+# Kisi bhi naam ka credentials/secrets dump
+*credentials*.json
+*secrets*.json
+!package-lock.json
+
+# ── Runtime output — user ka data, repo ka hissa nahi ────────────────────
+# Ye ads/videos user ke generate kiye hue hain. 29 MB pehle se hain aur har
+# demo par barhte hain; inhein commit karna repo ko bhaari aur user ka
+# content public kar deta hai.
+backend/generated_ads/
+backend/uploads/
+generated_ads/
+uploads/
+
+# Scraped/processed PDFs aur reports
+backend/*.pdf
+backend/seo_audit.pdf
+backend/*Report*.pdf
+backend/modules/sentiment/*.pdf
+
+# ── Local test artifacts (root aur backend, dono) ────────────────────────
+backend/ad.jpg
+backend/generated_ad.jpg
+backend/product.jpg
+backend/REAL_product.jpg
+backend/temp_*.jpg
+backend/temp_*.png
+backend/test_*.png
+backend/test_*.jpg
+backend/modules/ads_generation/test_*.png
+backend/modules/ads_generation/*.jpg
+backend/modules/ads_generation/test_output*.png
+
+# ── LLM spend ledger — machine-local counter, shared nahi hota ───────────
+backend/.llm_spend.json
+.llm_spend.json
+
+# ── Python ───────────────────────────────────────────────────────────────
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.sqlite3
+*.db
+
+# ── ML model weights — GitHub 100 MB par hard-reject karta hai ───────────
+*.safetensors
+*.pkl
+*.pt
+*.bin
+backend/modules/sentiment/models/
+
+# ── Editors / OS ─────────────────────────────────────────────────────────
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+
+# ── Next.js extra ────────────────────────────────────────────────────────
+.turbo/
+_quarantine/
+
+# Qoder IDE generated wiki — tool output, not source
+.qoder/

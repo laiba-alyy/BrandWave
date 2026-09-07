@@ -1,0 +1,2343 @@
+/* ============================================================
+   BrandWave — landing page theme
+   ------------------------------------------------------------
+   Port of brandwave.html. Every selector is scoped under
+   `.bw-landing` so this dark world stays on the marketing page
+   and never leaks into the (light) dashboard, which still runs
+   on Tailwind + app/globals.css.
+
+   Single committed dark world + one inverted bone panel.
+   ============================================================ */
+
+.bw-landing {
+  --ink: #060e0d;
+  --ink-raise: #0b1615;
+  --ink-card: #101e1c;
+  --ink-high: #162825;
+  --line: rgba(190, 225, 218, 0.1);
+  --line-strong: rgba(190, 225, 218, 0.18);
+
+  --text: #e9f3f0;
+  --text-dim: #96ada8;
+  --text-mute: #67807b;
+
+  --amber: #f0a63c;
+  --amber-lo: #ffd79b;
+  --amber-glow: rgba(240, 166, 60, 0.16);
+  --jade: #3ed9a4;
+  --jade-glow: rgba(62, 217, 164, 0.14);
+  --rose: #f0728a;
+
+  --bone: #f3eee4;
+  --bone-2: #e8e1d3;
+  --bone-ink: #12201e;
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+
+  --shell: 1180px;
+  --pad: clamp(20px, 5vw, 56px);
+
+  --f-display: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --f-body: var(--font-instrument-sans), "Helvetica Neue", Arial, sans-serif;
+  --f-mono: var(--font-jetbrains-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Keep the landing surface gradient-based; the hero uses its own light layer. */
+  position: relative;
+  isolation: isolate;
+  background-color: var(--ink);
+  background-image: linear-gradient(
+      to bottom,
+      rgba(6, 14, 13, 0.93),
+      rgba(6, 14, 13, 0.965)
+    );
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.bw-landing *,
+.bw-landing *::before,
+.bw-landing *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- background video layer ---------- */
+/*
+   z-index:-1 + parent par isolation:isolate = layer content ke peeche rehti
+   hai lekin .bw-landing ki apni background image ke upar. Is se page ke
+   static sections (jo z-index set nahi karte) video ke upar hi paint hote
+   hain, warna woh uske neeche chale jate.
+*/
+.bw-landing .bw-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.bw-landing .bw-bg__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Koi filter nahi -- video apne asli colors me chalti hai. Readability ab
+     scrim ke directional gradient se aati hai, poori footage ko tint kar ke
+     nahi. */
+}
+.bw-landing .bw-bg__scrim {
+  position: absolute;
+  inset: 0;
+  /*
+     Pehle yahan flat rgba(6,14,13) wash tha -- woh ink green hai, is liye poori
+     video par site ka green cast chadh jata tha. Ab do cheezein:
+       1. left-to-right black gradient -- sirf headline column ke neeche
+          darkening, right side video ko saaf chhorta hai.
+       2. top/bottom black fade -- navbar aur neeche wale .band section ke
+          seam ke liye; sab se neeche ink par khatam hota hai taake join
+          na dikhe.
+     Black use kiya green ke bajaye taake video ke apne colors sach rahen.
+  */
+  background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.58) 32%,
+      rgba(0, 0, 0, 0.24) 62%,
+      rgba(0, 0, 0, 0.1) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.14) 24%,
+      rgba(0, 0, 0, 0.24) 74%,
+      rgba(6, 14, 13, 0.72) 100%
+    );
+}
+
+/* Motion sensitivity: video band, still fallback chalu. */
+@media (prefers-reduced-motion: reduce) {
+  .bw-landing .bw-bg__video {
+    display: none;
+  }
+  .bw-landing .bw-bg__scrim {
+    background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.5) 34%,
+      rgba(0, 0, 0, 0.22) 66%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+}
+
+.bw-landing h1,
+.bw-landing h2,
+.bw-landing h3,
+.bw-landing h4 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 600;
+  text-wrap: balance;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: inherit;
+}
+.bw-landing p {
+  margin: 0;
+}
+.bw-landing a {
+  color: inherit;
+  text-decoration: none;
+}
+.bw-landing button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.bw-landing :focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.bw-landing .shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+.bw-landing .eyebrow {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.bw-landing .eyebrow--amber {
+  color: var(--amber);
+}
+
+.bw-landing .rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  margin: 0;
+}
+
+/* ---------- nav ---------- */
+.bw-landing .nav {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--ink) 82%, transparent);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.bw-landing .nav.is-stuck {
+  border-bottom-color: var(--line);
+}
+.bw-landing .nav__in {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: 66px;
+  /* Hero ke shell (1400px) ke saath match karta hai, warna brand logo hero ki
+     headline se ~110px andar reh jata tha aur alignment tooti nazar aati thi.
+     Nav hero ke upar hi tairta hai, is liye wohi alignment ahem hai. */
+  max-width: 1400px;
+}
+.bw-landing .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.bw-landing .brand svg {
+  display: block;
+}
+.bw-landing .nav__links {
+  display: flex;
+  gap: 26px;
+  margin-left: auto;
+}
+.bw-landing .nav__links a {
+  font-size: 14px;
+  color: var(--text-dim);
+  transition: color 0.2s;
+}
+.bw-landing .nav__links a:hover {
+  color: var(--text);
+}
+.bw-landing .nav__cta {
+  margin-left: 4px;
+}
+/* Nav CTA ka label do soorton mein: chhoti screen par chhota lafz, warna
+   button brand ke saath tuk kar clip ho jata tha. */
+.bw-landing .nav__cta-short {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .bw-landing .nav__links {
+    display: none;
+  }
+  .bw-landing .nav__cta {
+    margin-left: auto;
+  }
+  /* "Log in" mobile par ghost button ki jagah saada link ban jata hai — hataya
+     nahi ja sakta (landing se login ka wohi ek raasta hai), lekin do full
+     buttons 375px mein fit nahi hote.
+     NOTE: yahan specificity `.btn` (0,2,0) se zyada honi chahiye, warna neeche
+     wala `.bw-landing .btn { display:inline-flex }` jeet jata hai aur ye rule
+     chup-chaap bekaar ho jata hai. */
+  .bw-landing .nav__in .nav__secondary {
+    border-color: transparent;
+    padding-inline: 0;
+    color: var(--text-dim);
+  }
+  .bw-landing .nav__in .nav__secondary:hover {
+    background: none;
+    color: var(--text);
+  }
+}
+
+@media (max-width: 560px) {
+  .bw-landing .nav__in {
+    gap: 12px;
+  }
+  .bw-landing .brand {
+    font-size: 17px;
+    min-width: 0;
+  }
+  .bw-landing .nav__in .btn {
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+  .bw-landing .nav__cta-long {
+    display: none;
+  }
+  .bw-landing .nav__cta-short {
+    display: inline;
+  }
+}
+
+/* Sticky nav 66px ka hai — anchor jumps ke waqt heading uske neeche chhup
+   jati thi, is liye har target section apna scroll margin rakhta hai. */
+.bw-landing [id] {
+  scroll-margin-top: 84px;
+}
+
+/* ---------- buttons ---------- */
+.bw-landing .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.25s ease;
+  white-space: nowrap;
+}
+.bw-landing .btn--primary {
+  background: var(--amber);
+  color: #1a1206;
+  font-weight: 600;
+  box-shadow: 0 0 0 rgba(240, 166, 60, 0);
+}
+.bw-landing .btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 32px -10px rgba(240, 166, 60, 0.65);
+}
+.bw-landing .btn--ghost {
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+}
+.bw-landing .btn--ghost:hover {
+  border-color: rgba(190, 225, 218, 0.34);
+  background: rgba(190, 225, 218, 0.04);
+}
+/*
+ * ROSHAN sections par ghost button ko apna rang chahiye.
+ *
+ * BUG jo ye theek karta hai: --text is dark theme ka near-safed (#e9f3f0) hai,
+ * aur .btn--ghost usay seedha istemal karta tha. Hero ka background roshan
+ * (#f4fbf7) hai — yani "Explore features" safed par safed likha ja raha tha
+ * aur BILKUL nazar nahi aata tha. Wahi haal har us section ka hota jo roshan
+ * ho.
+ */
+.bw-landing .hero .btn--ghost,
+.bw-landing .light .btn--ghost {
+  color: #17332e;
+  border-color: rgba(23, 51, 46, 0.22);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(6px);
+}
+.bw-landing .hero .btn--ghost:hover,
+.bw-landing .light .btn--ghost:hover {
+  border-color: rgba(23, 51, 46, 0.4);
+  background: #fff;
+  transform: translateY(-1px);
+}
+.bw-landing .btn--lg {
+  padding: 14px 24px;
+  font-size: 15px;
+}
+
+/* ---------- hero ---------- */
+.bw-landing .hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: max(560px, calc(100svh - 66px));
+  padding-top: clamp(48px, 8vw, 92px);
+  padding-bottom: clamp(56px, 8vw, 104px);
+  color: #17332e;
+  background-color: #f4fbf7;
+  background-image: url("/background_image.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+.bw-landing .hero__in {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  /* Ek hi column: copy. Preview ab grid ka hissa nahi -- wo .hero se absolute
+     anchor hoti hai taake viewport ke right edge tak bleed kar sake (shell ki
+     max-width use rok deti). */
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  /* Baqi page 1180px shell par hai, lekin hero me copy left me bohat andar
+     ghus jati thi aur left gutter khali lagta tha. Sirf hero ka shell chaura
+     hai taake text kinare ke qareeb aaye. */
+  max-width: none;
+  margin-inline: 0;
+  padding-left: 0;
+}
+/* Media absolute hai (grid se bahar), is liye copy ko khud rukna parta hai
+   warna wo video ke neeche chali jati hai. */
+.bw-landing .hero__copy {
+  position: relative;
+  left: clamp(-260px, -14vw, -56px);
+  justify-self: start;
+  max-width: 620px;
+  text-align: left;
+  isolation: isolate;
+}
+.bw-landing .hero__shopify {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: clamp(4px, 2vw, 28px);
+  width: clamp(480px, 54vw, 860px);
+  height: auto;
+  display: block;
+  transform: translateY(-50%) rotate(2deg);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, #000 70%, transparent 100%);
+  filter: drop-shadow(18px 24px 22px rgba(20, 57, 43, 0.2));
+  transition: transform 0.35s ease, filter 0.35s ease;
+}
+.bw-landing .hero__shopify:hover {
+  transform: translateY(-53%) rotate(0deg) scale(1.025);
+  filter: drop-shadow(22px 30px 26px rgba(20, 57, 43, 0.28));
+}
+.bw-landing .hero__copy::before,
+.bw-landing .hero__copy::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+.bw-landing .hero__copy::before {
+  left: 11%;
+  top: 42%;
+  width: 70%;
+  height: 210px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(240, 166, 60, 0.42) 0%,
+    rgba(240, 166, 60, 0.2) 30%,
+    rgba(240, 166, 60, 0.07) 56%,
+    transparent 76%
+  );
+  filter: blur(22px);
+  transform: translateY(-8%);
+  animation: hero-torch-pulse 5s ease-in-out infinite;
+}
+.bw-landing .hero__copy::after {
+  left: 22%;
+  top: 28%;
+  width: 48%;
+  height: 230px;
+  background: conic-gradient(
+    from 180deg at 50% 100%,
+    transparent 18deg,
+    rgba(240, 166, 60, 0.13) 35deg,
+    rgba(255, 215, 155, 0.2) 50deg,
+    rgba(240, 166, 60, 0.13) 65deg,
+    transparent 82deg
+  );
+  filter: blur(18px);
+  opacity: 0.8;
+  transform-origin: 50% 100%;
+  animation: hero-torch-sway 7s ease-in-out infinite;
+}
+
+@keyframes hero-torch-pulse {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: translateY(-8%) scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-8%) scale(1.04);
+  }
+}
+
+@keyframes hero-torch-sway {
+  0%,
+  100% {
+    transform: rotate(-3deg) scaleX(0.94);
+  }
+  50% {
+    transform: rotate(3deg) scaleX(1.06);
+  }
+}
+
+.bw-landing .hero h1 {
+  /* Column ab aadha hai, is liye max 76px se 60px -- warna har lafz apni
+     line par chala jata tha. */
+  font-size: clamp(40px, 4.8vw, 62px);
+  font-weight: 700;
+  font-variation-settings: "opsz" 120;
+  margin: 18px 0 0;
+  /*
+     Video ke bright frames (shuru wala white office shot) par white text
+     gum ho jata tha. Pehle iska hal poori footage ko dark karna tha; ab
+     sirf text ke peeche halka shadow hai -- video roshan rehti hai aur
+     headline har frame par readable.
+  */
+  color: #17332e;
+  text-shadow: 0 2px 24px rgba(255, 255, 255, 0.9), 0 1px 4px rgba(23, 51, 46, 0.12);
+}
+.bw-landing .hero__headline-dark {
+  color: #17231f;
+}
+.bw-landing .hero__headline-amber {
+  color: #c77919;
+}
+.bw-landing .hero h1 em {
+  font-style: italic;
+  color: #c77919;
+  font-variation-settings: "opsz" 144;
+}
+.bw-landing .hero__sub {
+  margin-top: 22px;
+  max-width: 46ch;
+  color: #52716a;
+  font-size: clamp(15.5px, 1.5vw, 17.5px);
+}
+.bw-landing .hero .eyebrow {
+  text-shadow: 0 1px 12px rgba(255, 255, 255, 0.85);
+}
+.bw-landing .hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+.bw-landing .hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 26px;
+  font-size: 12.5px;
+  color: var(--text-mute);
+  font-family: var(--f-mono);
+}
+/* Hero 940px se neeche single column -- media panel copy ke neeche. */
+@media (max-width: 940px) {
+  /* Chhoti screen par side-bleed ki jagah nahi -- video copy ke neeche
+     normal flow me aa jati hai, edges phir bhi feathered.
+     .hero flex hai, is liye column karna parta hai warna media shell ke
+     bagal me ja kar baith jati. */
+  .bw-landing .hero {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  /* Grid ko bhi ek column karna zaroori hai -- warna preview 940px se neeche
+     bhi copy ke bagal me nichoR kar baithi rehti. */
+  .bw-landing .hero__in {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bw-landing .hero__copy {
+    max-width: none;
+  }
+  .bw-landing .hero__shopify {
+    top: 30%;
+    right: 3%;
+    width: min(74vw, 560px);
+    z-index: 1;
+    opacity: 0.82;
+  }
+}
+
+@media (max-width: 560px) {
+  .bw-landing .hero__shopify {
+    top: 24%;
+    right: -10%;
+    width: 104vw;
+    opacity: 0.62;
+  }
+}
+
+.bw-landing .hero__meta span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.bw-landing .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--jade);
+  flex: none;
+}
+
+/* store panel */
+.bw-landing .store {
+  background: linear-gradient(180deg, rgba(22, 40, 37, 0.92), rgba(10, 22, 21, 0.94));
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: 0 40px 90px -50px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.bw-landing .store__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.bw-landing .store__logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  flex: none;
+  background: linear-gradient(140deg, var(--amber), #c8622b);
+  display: grid;
+  place-items: center;
+  font-family: var(--f-display);
+  font-weight: 700;
+  color: #20140a;
+  font-size: 17px;
+}
+.bw-landing .store__name {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+.bw-landing .store__url {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  color: var(--text-mute);
+}
+.bw-landing .chip {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(62, 217, 164, 0.3);
+  color: var(--jade);
+  background: rgba(62, 217, 164, 0.08);
+}
+.bw-landing .chip--amber {
+  color: var(--amber);
+  border-color: rgba(240, 166, 60, 0.3);
+  background: rgba(240, 166, 60, 0.08);
+}
+.bw-landing .chip--rose {
+  color: var(--rose);
+  border-color: rgba(240, 114, 138, 0.3);
+  background: rgba(240, 114, 138, 0.08);
+}
+.bw-landing .chip--mute {
+  color: var(--text-mute);
+  border-color: var(--line-strong);
+  background: transparent;
+}
+
+.bw-landing .store__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.bw-landing .stat {
+  background: var(--ink-card);
+  padding: 14px 15px;
+}
+.bw-landing .stat__n {
+  font-family: var(--f-mono);
+  font-size: 21px;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.bw-landing .stat__l {
+  font-size: 11.5px;
+  color: var(--text-mute);
+  margin-top: 3px;
+}
+
+.bw-landing .senti {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 15px;
+  background: rgba(62, 217, 164, 0.04);
+}
+.bw-landing .senti__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.bw-landing .senti__pct {
+  font-family: var(--f-mono);
+  font-size: 19px;
+  color: var(--jade);
+  font-variant-numeric: tabular-nums;
+}
+.bw-landing .senti__lbl {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.bw-landing .bar {
+  display: flex;
+  height: 7px;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 11px;
+  gap: 2px;
+  background: rgba(190, 225, 218, 0.08);
+}
+.bw-landing .bar i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+}
+.bw-landing .bar__pos {
+  background: var(--jade);
+}
+.bw-landing .bar__neu {
+  background: rgba(190, 225, 218, 0.22); 
+}
+.bw-landing .bar__neg {
+  background: var(--rose);
+}
+.bw-landing .senti__legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 10px;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  color: var(--text-mute);
+}
+.bw-landing .senti__legend b {
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.bw-landing .ticker {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+.bw-landing .ticker svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* load motion — elements stay visible, only shift */
+@keyframes bw-rise {
+  from {
+    transform: translateY(16px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.bw-landing .rise {
+  animation: bw-rise 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.bw-landing .rise--1 {
+  animation-delay: 0.05s;
+}
+.bw-landing .rise--2 {
+  animation-delay: 0.13s;
+}
+.bw-landing .rise--3 {
+  animation-delay: 0.21s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bw-landing .rise {
+    animation: none;
+  }
+}
+
+/* ---------- band ---------- */
+/* ═══════════════ FEATURES ═══════════════
+   Pehle har card me ek hover-to-play video clip thi (chhe clips ~24 MB).
+   Wo chhoti clips me kuch samajh nahi aata tha aur hover par 1.3x zoom ho kar
+   card se bahar nikalti thin -- shor zyada, maloomat kam. Ab card khud design
+   hai: icon, index, title, description aur ek accent rule. Koi video download
+   nahi hoti, landing page halka hai, aur cards ek doosre ke barabar rehte hain.
+*/
+.bw-landing .band {
+  position: relative;
+  overflow: hidden;
+  color: #17332e;
+  border-block: 1px solid rgba(23, 51, 46, 0.1);
+  background:
+    radial-gradient(680px 360px at 8% 0%, rgba(255, 255, 255, 0.95), transparent 72%),
+    linear-gradient(135deg, #f4fbf7 0%, #e9f7f0 55%, #f9fcfa 100%);
+}
+.bw-landing .band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("/shopify_image.svg");
+  background-repeat: no-repeat;
+  background-size: min(42vw, 560px) auto;
+  background-position: 94% 52%;
+  opacity: 0.12;
+}
+/* Pehle yahan `min-height: max(620px, 100svh - 66px)` tha -- us waqt har card
+   me 16:10 ki video clip thi, to grid khud itni oonchi ho jati thi. Clips
+   hatne ke baad wahi min-height cards ke upar aur neeche bohat bara khali
+   maidan chhod deti thi. Ab oonchai content se aati hai. */
+.bw-landing .band__in {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 44px;
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding: 92px var(--pad) 96px;
+}
+.bw-landing .band__intro h2 {
+  font-size: clamp(28px, 3.4vw, 40px);
+  font-variation-settings: "opsz" 96;
+  margin-top: 13px;
+}
+.bw-landing .band__intro p {
+  margin-top: 15px;
+  max-width: 58ch;
+  font-size: clamp(14.5px, 1.35vw, 16px);
+  line-height: 1.6;
+  color: #52716a;
+}
+.bw-landing .band__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* ---------- card ---------- */
+.bw-landing .band__cell {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  min-width: 0;
+  padding: 26px 24px 28px;
+  overflow: hidden;
+  border: 1px solid rgba(23, 51, 46, 0.12);
+  border-radius: var(--r-md);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(238, 248, 242, 0.92));
+  box-shadow: 0 18px 38px -30px rgba(23, 51, 46, 0.36);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* Upar-baayen se aati hui halki roshni -- sirf hover par. z-index -1 se ye
+   card ke content ke NEECHE rehti hai (isolation: isolate is ko card ke andar
+   qaid rakhta hai). */
+.bw-landing .band__cell::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(120% 80% at 12% 0%, var(--amber-glow), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.bw-landing .band__cell:hover,
+.bw-landing .band__cell:focus-within {
+  transform: translateY(-4px);
+  border-color: rgba(240, 166, 60, 0.58);
+  box-shadow: 0 26px 50px -30px rgba(240, 166, 60, 0.3),
+              0 0 0 1px rgba(240, 166, 60, 0.16);
+}
+.bw-landing .band__cell:hover::before,
+.bw-landing .band__cell:focus-within::before {
+  opacity: 1;
+}
+
+/* ---------- head: icon + index ---------- */
+.bw-landing .band__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.bw-landing .band__icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  place-items: center;
+  border: 1px solid rgba(240, 166, 60, 0.34);
+  border-radius: 11px;
+  color: var(--amber);
+  background: linear-gradient(150deg, rgba(240, 166, 60, 0.18), rgba(240, 166, 60, 0.04));
+  transition: border-color 0.3s ease, background 0.3s ease,
+              color 0.3s ease, transform 0.3s ease;
+}
+.bw-landing .band__cell:hover .band__icon,
+.bw-landing .band__cell:focus-within .band__icon {
+  border-color: rgba(240, 166, 60, 0.75);
+  background: linear-gradient(150deg, rgba(240, 166, 60, 0.34), rgba(240, 166, 60, 0.1));
+  color: var(--amber-lo);
+  transform: translateY(-1px);
+}
+.bw-landing .band__icon svg {
+  width: 20px;
+  height: 20px;
+}
+.bw-landing .band__n {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: #729089;
+  transition: color 0.3s ease;
+}
+.bw-landing .band__cell:hover .band__n,
+.bw-landing .band__cell:focus-within .band__n {
+  color: var(--amber);
+}
+
+/* ---------- text ---------- */
+.bw-landing .band__k {
+  margin: 3px 0 0;
+  font-family: var(--f-display);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: #17332e;
+}
+.bw-landing .band__v {
+  /* flex: 1 -- description jitni bhi lambi ho, accent rule har card me neeche
+     ek hi baseline par baithti hai. */
+  flex: 1;
+  margin: 0;
+  max-width: 40ch;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #52716a;
+}
+
+/* ---------- accent rule ---------- */
+.bw-landing .band__rule {
+  width: 34px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--amber), rgba(240, 166, 60, 0));
+  opacity: 0.55;
+  transition: width 0.34s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease;
+}
+.bw-landing .band__cell:hover .band__rule,
+.bw-landing .band__cell:focus-within .band__rule {
+  width: 76px;
+  opacity: 1;
+}
+
+@media (max-width: 900px) {
+  .bw-landing .band__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .bw-landing .band__grid {
+    grid-template-columns: 1fr;
+  }
+  .bw-landing .band__in {
+    gap: 34px;
+    padding-block: 60px 64px;
+  }
+}
+
+/* ---------- section frame ---------- */
+.bw-landing .sec {
+  padding-block: clamp(64px, 9vw, 116px);
+}
+.bw-landing .sec--flush {
+  padding-top: 0;
+}
+.bw-landing .sec__head {
+  max-width: 62ch;
+}
+.bw-landing .sec__head h2 {
+  font-size: clamp(30px, 4vw, 46px);
+  font-variation-settings: "opsz" 96;
+  margin-top: 14px;
+}
+.bw-landing .sec__head p {
+  color: var(--text-dim);
+  margin-top: 16px;
+  font-size: clamp(15px, 1.4vw, 16.5px);
+  max-width: 54ch;
+}
+
+/* ---------- module explorer ---------- */
+.bw-landing .explorer {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 22px;
+  margin-top: 42px;
+  align-items: start;
+}
+@media (max-width: 940px) {
+  .bw-landing .explorer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bw-landing .rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+@media (max-width: 940px) {
+  .bw-landing .rail {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+  }
+  .bw-landing .rail__item {
+    flex: none;
+    width: 220px;
+  }
+}
+.bw-landing .rail__item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  padding: 12px 13px;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.bw-landing .rail__item:hover {
+  background: rgba(190, 225, 218, 0.04);
+}
+.bw-landing .rail__item[aria-selected="true"] {
+  background: var(--ink-card);
+  border-color: var(--line-strong);
+}
+.bw-landing .rail__n {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-mute);
+  padding-top: 3px;
+  flex: none;
+  width: 20px;
+}
+.bw-landing .rail__item[aria-selected="true"] .rail__n {
+  color: var(--amber);
+}
+.bw-landing .rail__item > span:last-child {
+  display: block;
+  min-width: 0;
+}
+.bw-landing .rail__t {
+  display: block;
+  font-size: 14.5px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.bw-landing .rail__d {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text-mute);
+  line-height: 1.4;
+  margin-top: 3px;
+}
+
+.bw-landing .screen {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--ink-card), var(--ink-raise));
+  overflow: hidden;
+  min-height: 540px;
+  box-shadow: 0 50px 100px -60px rgba(0, 0, 0, 0.95);
+}
+.bw-landing .screen__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(6, 14, 13, 0.5);
+}
+.bw-landing .screen__dots {
+  display: flex;
+  gap: 6px;
+}
+.bw-landing .screen__dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(190, 225, 218, 0.16);
+  display: block;
+}
+.bw-landing .screen__path {
+  font-family: var(--f-mono);
+  font-size: 11.5px;
+  color: var(--text-mute);
+}
+.bw-landing .screen__path b {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+.bw-landing .screen__body {
+  padding: 22px clamp(18px, 3vw, 26px) 26px;
+}
+.bw-landing .panel[hidden] {
+  display: none;
+}
+.bw-landing .panel__h {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.bw-landing .panel__h h3 {
+  font-size: 22px;
+  font-variation-settings: "opsz" 60;
+}
+.bw-landing .panel__lead {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-top: 8px;
+  max-width: 58ch;
+}
+.bw-landing .panel__grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 20px;
+}
+.bw-landing .g2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.bw-landing .g3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 720px) {
+  .bw-landing .g2,
+  .bw-landing .g3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bw-landing .card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 15px 16px;
+  background: rgba(6, 14, 13, 0.42);
+}
+.bw-landing .card__k {
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+.bw-landing .card__v {
+  font-size: 14px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.bw-landing .list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.bw-landing .list li {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.bw-landing .list li:last-child {
+  border-bottom: 0;
+}
+.bw-landing .list .num {
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  color: var(--amber);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+  min-width: 46px;
+}
+.bw-landing .list .who {
+  margin-left: auto;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-mute);
+  flex: none;
+}
+
+.bw-landing .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+.bw-landing .tag {
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  color: var(--text-dim);
+}
+.bw-landing .tag b {
+  font-family: var(--f-mono);
+  font-weight: 500;
+  color: var(--text);
+  font-size: 11.5px;
+}
+
+.bw-landing .tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.bw-landing .tbl th {
+  text-align: left;
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  padding: 0 12px 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.bw-landing .tbl td {
+  padding: 11px 12px 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+.bw-landing .tbl tr:last-child td {
+  border-bottom: 0;
+}
+.bw-landing .tbl .n {
+  font-family: var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  padding-right: 0;
+}
+.bw-landing .meter {
+  display: inline-block;
+  width: 54px;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(190, 225, 218, 0.14);
+  overflow: hidden;
+  vertical-align: middle;
+}
+.bw-landing .meter i {
+  display: block;
+  height: 100%;
+  background: var(--amber);
+}
+.bw-landing .scroll-x {
+  overflow-x: auto;
+}
+
+.bw-landing .diff {
+  display: grid;
+  gap: 10px;
+}
+.bw-landing .diff__row {
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  font-size: 13.5px;
+  line-height: 1.5;
+  border: 1px solid var(--line);
+}
+.bw-landing .diff__row.is-old {
+  color: var(--text-mute);
+  text-decoration: line-through;
+  text-decoration-color: rgba(240, 114, 138, 0.5);
+}
+.bw-landing .diff__row.is-new {
+  border-color: rgba(62, 217, 164, 0.28);
+  background: rgba(62, 217, 164, 0.06);
+}
+.bw-landing .diff__lbl {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* ad canvas mock */
+.bw-landing .adshot {
+  position: relative;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  aspect-ratio: 4/5;
+  background: radial-gradient(120% 90% at 22% 12%, #3a2a16, #0c1615 70%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 14px;
+}
+.bw-landing .adshot__prod {
+  position: absolute;
+  inset: 16% 22% 26%;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #e7c79a, #b4763f 55%, #6e3f22);
+  box-shadow: 0 24px 50px -18px rgba(0, 0, 0, 0.8);
+}
+.bw-landing .adshot__prod::after {
+  content: "";
+  position: absolute;
+  inset: 14% 26% 12% 26%;
+  border-radius: 6px;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.14) 0 5px,
+    transparent 5px 11px
+  );
+}
+.bw-landing .adshot__txt {
+  position: relative;
+  font-family: var(--f-display);
+  font-size: 19px;
+  line-height: 1.1;
+}
+.bw-landing .adshot__sub {
+  position: relative;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  color: var(--amber-lo);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+.bw-landing .adshot--src {
+  background: #0c1615;
+}
+.bw-landing .adshot--src .adshot__prod {
+  inset: 20% 26% 20%;
+}
+
+.bw-landing .frames {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.bw-landing .frame {
+  aspect-ratio: 9/12;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(165deg, #24312c, #0c1615);
+}
+.bw-landing .frame i {
+  position: absolute;
+  inset: 24% 28%;
+  border-radius: 5px;
+  background: linear-gradient(150deg, #e7c79a, #a96c3c);
+  display: block;
+}
+.bw-landing .frame span {
+  position: absolute;
+  left: 7px;
+  bottom: 6px;
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  color: var(--text-mute);
+}
+.bw-landing .timeline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.bw-landing .timeline__track {
+  flex: 1;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(190, 225, 218, 0.14);
+  position: relative;
+}
+.bw-landing .timeline__track i {
+  position: absolute;
+  inset: 0 62% 0 0;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--jade), var(--amber));
+  display: block;
+}
+.bw-landing .timeline__t {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  color: var(--text-mute);
+}
+
+/* chat mock */
+.bw-landing .chat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.bw-landing .msg {
+  max-width: 78%;
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.bw-landing .msg--them {
+  background: rgba(190, 225, 218, 0.06);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 5px;
+}
+.bw-landing .msg--us {
+  align-self: flex-end;
+  background: rgba(240, 166, 60, 0.13);
+  border: 1px solid rgba(240, 166, 60, 0.28);
+  border-bottom-right-radius: 5px;
+}
+.bw-landing .msg--sys {
+  align-self: center;
+  max-width: 100%;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rose);
+  border: 1px dashed rgba(240, 114, 138, 0.35);
+  background: transparent;
+}
+
+/* dashboard mock */
+.bw-landing .tiles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 720px) {
+  .bw-landing .tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bw-landing .frames {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.bw-landing .tile {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 13px 14px;
+  background: rgba(6, 14, 13, 0.45);
+}
+.bw-landing .tile__k {
+  font-size: 11.5px;
+  color: var(--text-mute);
+}
+.bw-landing .tile__v {
+  font-family: var(--f-mono);
+  font-size: 18px;
+  margin-top: 6px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.bw-landing .tile__d {
+  font-size: 11.5px;
+  margin-top: 4px;
+}
+.bw-landing .up {
+  color: var(--jade);
+}
+.bw-landing .down {
+  color: var(--rose);
+}
+.bw-landing .muted {
+  color: var(--text-mute);
+}
+.bw-landing .spark {
+  display: block;
+  width: 100%;
+  height: 26px;
+  margin-top: 8px;
+}
+
+/* empty state — jab tak real data wire nahi hota */
+.bw-landing .empty {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  padding: 22px 18px;
+  text-align: center;
+  color: var(--text-mute);
+  font-size: 13px;
+}
+.bw-landing .empty b {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+/* ---------- how ---------- */
+.bw-landing .how__head {
+  max-width: 760px;
+  margin-inline: auto;
+  text-align: center;
+}
+.bw-landing .how__head h2 {
+  margin-top: 12px;
+  color: var(--amber);
+  font-size: clamp(32px, 4.5vw, 50px);
+  text-shadow: 0 10px 34px rgba(240, 166, 60, 0.16);
+}
+.bw-landing .how__head::after {
+  content: "";
+  display: block;
+  width: 58px;
+  height: 3px;
+  margin: 20px auto 0;
+  border-radius: 99px;
+  background: var(--amber);
+  box-shadow: 0 0 22px rgba(240, 166, 60, 0.5);
+}
+.bw-landing .steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 44px;
+}
+@media (max-width: 860px) {
+  .bw-landing .steps {
+    grid-template-columns: 1fr;
+  }
+}
+.bw-landing .step {
+  position: relative;
+  display: flex;
+  min-height: 310px;
+  flex-direction: column;
+  padding: 26px 24px 24px;
+  overflow: hidden;
+  border: 1px solid rgba(240, 166, 60, 0.22);
+  border-radius: var(--r-md);
+  background: linear-gradient(150deg, rgba(240, 166, 60, 0.1), rgba(22, 40, 37, 0.82) 38%, rgba(11, 22, 21, 0.95));
+  box-shadow: inset 0 2px 0 rgba(240, 166, 60, 0.5), 0 24px 48px -34px rgba(0, 0, 0, 0.95);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.bw-landing .step::after {
+  content: "";
+  position: absolute;
+  right: -34px;
+  bottom: -42px;
+  width: 130px;
+  height: 130px;
+  border: 1px solid rgba(240, 166, 60, 0.14);
+  border-radius: 50%;
+  box-shadow: 0 0 0 18px rgba(240, 166, 60, 0.035), 0 0 0 36px rgba(240, 166, 60, 0.02);
+  pointer-events: none;
+}
+.bw-landing .step:hover {
+  transform: translateY(-4px);
+  border-color: rgba(240, 166, 60, 0.55);
+  box-shadow: inset 0 2px 0 var(--amber), 0 28px 52px -32px rgba(240, 166, 60, 0.3);
+}
+@media (max-width: 860px) {
+  .bw-landing .step {
+    min-height: 260px;
+  }
+}
+.bw-landing .step__n {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(240, 166, 60, 0.35);
+  border-radius: 999px;
+  background: rgba(240, 166, 60, 0.1);
+}
+.bw-landing .step h3 {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(24px, 2.5vw, 29px);
+  line-height: 1.12;
+  letter-spacing: 0;
+  margin-top: 20px;
+  font-variation-settings: "opsz" 48;
+}
+.bw-landing .step h3::after {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 2px;
+  margin-top: 12px;
+  border-radius: 99px;
+  background: var(--amber);
+  box-shadow: 0 0 14px rgba(240, 166, 60, 0.45);
+}
+.bw-landing .step p {
+  position: relative;
+  z-index: 1;
+  max-width: 35ch;
+  margin-top: 18px;
+  color: rgba(233, 243, 240, 0.88);
+  font-size: 15.5px;
+  line-height: 1.58;
+  letter-spacing: 0;
+}
+/* ---------- language ---------- */
+.bw-landing .lang {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: clamp(28px, 5vw, 60px);
+  align-items: center;
+}
+@media (max-width: 940px) {
+  .bw-landing .lang {
+    grid-template-columns: 1fr;
+  }
+}
+.bw-landing .lang__head h2 {
+  font-size: clamp(28px, 3.6vw, 42px);
+  margin-top: 14px;
+  color: var(--amber);
+}
+.bw-landing .lang__head p {
+  max-width: 34ch;
+  margin-top: 18px;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.bw-landing .insight {
+  position: relative;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ink-card), var(--ink-raise));
+  box-shadow: 0 44px 90px -60px rgba(0, 0, 0, 0.95);
+}
+.bw-landing .insight__top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.bw-landing .toggle {
+  margin-left: auto;
+  display: flex;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(6, 14, 13, 0.6);
+}
+.bw-landing .toggle button {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: var(--text-mute);
+  transition: background 0.18s, color 0.18s;
+}
+.bw-landing .toggle button[aria-pressed="true"] {
+  background: var(--amber);
+  color: #1a1206;
+  font-weight: 500;
+}
+.bw-landing .insight__body {
+  padding: 28px 26px 26px;
+  background: linear-gradient(145deg, rgba(240, 166, 60, 0.06), transparent 38%);
+}
+.bw-landing .insight__body h3 {
+  max-width: 23ch;
+  font-size: clamp(22px, 2.5vw, 30px);
+  font-variation-settings: "opsz" 60;
+  line-height: 1.22;
+}
+.bw-landing .insight__body p {
+  max-width: 52ch;
+  margin-top: 16px;
+  color: rgba(233, 243, 240, 0.88);
+  font-size: 15px;
+  line-height: 1.62;
+}
+.bw-landing .evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- pricing (inverted) ----------
+   Prototype mein ye class `.invert` thi. Yahan naam badalna PARA hai: Tailwind
+   ki apni `invert` utility hoti hai (`filter: invert(100%)`), aur app/globals.css
+   Tailwind import karti hai. Landing ke rules `filter` set hi nahi karte, is liye
+   Tailwind wala bila-muqabla jeet jata tha — poora bone panel ulta render hota
+   tha (cream → dark, amber button → neela). Computed colours theek dikhte thay,
+   kyunke filter descendants ke computed styles nahi badalta; sirf pixels badalte
+   hain. Is liye class namespaced hai.
+
+   Ehtiyat: yahan koi bhi naya class-name rakhne se pehle dekh lein ke wo Tailwind
+   ki utility se na takraye. */
+.bw-landing .bw-invert {
+  background: var(--bone);
+  color: var(--bone-ink);
+}
+.bw-landing .bw-invert h2 {
+  color: var(--bone-ink);
+}
+.bw-landing .bw-invert .eyebrow {
+  color: #7c6e56;
+}
+.bw-landing .bw-invert .sec__head p {
+  color: #4b5b57;
+}
+.bw-landing .prices__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+  max-width: none;
+}
+.bw-landing .prices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 40px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .bw-landing .prices {
+    grid-template-columns: 1fr;
+  }
+}
+.bw-landing .plan {
+  background: #fbf8f1;
+  border: 1px solid var(--bone-2);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bw-landing .plan--hero {
+  background: var(--bone-ink);
+  color: var(--bone);
+  border-color: var(--bone-ink);
+  box-shadow: 0 30px 60px -34px rgba(18, 32, 30, 0.6);
+}
+.bw-landing .plan__name {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #7c6e56;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bw-landing .plan--hero .plan__name {
+  color: var(--amber);
+}
+.bw-landing .plan__name .chip {
+  margin-left: 0;
+}
+.bw-landing .plan__price {
+  font-family: var(--f-display);
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variation-settings: "opsz" 72;
+}
+.bw-landing .plan__price small {
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 400;
+  color: #6c7c78;
+  letter-spacing: 0;
+}
+.bw-landing .plan--hero .plan__price small {
+  color: var(--text-mute);
+}
+.bw-landing .plan__for {
+  font-size: 13.5px;
+  color: #4b5b57;
+}
+.bw-landing .plan--hero .plan__for {
+  color: var(--text-dim);
+}
+.bw-landing .plan ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 13.5px;
+}
+.bw-landing .plan li {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+.bw-landing .plan li svg {
+  flex: none;
+  margin-top: 4px;
+}
+.bw-landing .plan .btn--ghost {
+  border-color: var(--bone-2);
+  color: var(--bone-ink);
+  justify-content: center;
+}
+.bw-landing .plan .btn--ghost:hover {
+  background: var(--bone-2);
+  border-color: var(--bone-2);
+}
+.bw-landing .plan--hero .btn--ghost {
+  border-color: rgba(233, 243, 240, 0.24);
+  color: var(--bone);
+}
+.bw-landing .plan__cta {
+  margin-top: auto;
+  display: flex;
+}
+.bw-landing .plan__cta .btn {
+  width: 100%;
+  justify-content: center;
+}
+.bw-landing .cur {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--bone-2);
+  border-radius: 999px;
+  background: #fbf8f1;
+}
+.bw-landing .cur button {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  color: #7c6e56;
+}
+.bw-landing .cur button[aria-pressed="true"] {
+  background: var(--bone-ink);
+  color: var(--bone);
+}
+.bw-landing .prices__note {
+  margin-top: 22px;
+  font-size: 12.5px;
+  color: #6c7c78;
+}
+
+/* ---------- faq ---------- */
+.bw-landing #faq h2,
+.bw-landing #faq .faq summary {
+  color: var(--amber);
+}
+.bw-landing .faq {
+  margin-top: 34px;
+  border-top: 1px solid var(--line);
+}
+.bw-landing .faq details {
+  border-bottom: 1px solid var(--line);
+}
+.bw-landing .faq summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 20px 40px 20px 0;
+  position: relative;
+  font-size: 16.5px;
+  font-family: var(--f-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.bw-landing .faq summary::-webkit-details-marker {
+  display: none;
+}
+.bw-landing .faq summary::after {
+  content: "+";
+  position: absolute;
+  right: 6px;
+  top: 18px;
+  font-family: var(--f-mono);
+  font-size: 19px;
+  color: var(--amber);
+  transition: transform 0.2s ease;
+}
+.bw-landing .faq details[open] summary::after {
+  transform: rotate(45deg);
+}
+.bw-landing .faq p {
+  padding: 0 0 22px;
+  color: #fff;
+  font-size: 14.5px;
+  max-width: 68ch;
+}
+
+/* ---------- final cta ---------- */
+.bw-landing .final {
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+}
+.bw-landing .final::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(700px 320px at 50% 0%, var(--amber-glow), transparent 70%);
+}
+.bw-landing .final__in {
+  position: relative;
+  text-align: center;
+  padding-block: clamp(64px, 9vw, 110px);
+}
+.bw-landing .final h2 {
+  font-size: clamp(32px, 5vw, 58px);
+  font-variation-settings: "opsz" 120;
+  margin-top: 16px;
+}
+.bw-landing .final p {
+  color: var(--text-dim);
+  margin: 18px auto 0;
+  max-width: 48ch;
+}
+.bw-landing .final .hero__actions {
+  justify-content: center;
+}
+
+/* ---------- footer ---------- */
+.bw-landing .foot {
+  border-top: 1px solid var(--line);
+  background: var(--ink-raise);
+}
+.bw-landing .foot__in {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+  padding-block: 28px;
+}
+.bw-landing .foot__cols {
+  display: flex;
+  gap: 28px;
+  margin-left: auto;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-mute);
+}
+.bw-landing .foot__cols a:hover {
+  color: var(--text);
+}
+.bw-landing .foot__note {
+  font-size: 12px;
+  color: var(--text-mute);
+  padding-bottom: 26px;
+}
+
+
+/* Motion kam karne wali setting par card na uthe, na rule barhe. */
+@media (prefers-reduced-motion: reduce) {
+  .bw-landing .band__cell,
+  .bw-landing .band__icon,
+  .bw-landing .band__rule { transition: none; }
+  .bw-landing .band__cell:hover,
+  .bw-landing .band__cell:focus-within { transform: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   HERO PRODUCT MOCKUP
+   ═══════════════════════════════════════════════════════════════════
+   Hero ke daayen taraf BrandWave ka apna dashboard — tasveer nahi, markup.
+   Dekho components/home/HeroMockup.tsx (wahan wajah likhi hai).
+
+   Roshan hero par GEHRA (ink) window jaan boojh kar: sab se zyada contrast
+   wahin banta hai jahan nazar sab se pehle jati hai, aur ye dashboard ki asal
+   shakl se bhi mail khata hai.
+   ═══════════════════════════════════════════════════════════════════ */
+.bw-landing .heromock {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: clamp(4px, 3vw, 56px);
+  width: clamp(420px, 46vw, 660px);
+  transform: translateY(-50%) rotate(1.4deg);
+  transition: transform 0.4s ease;
+}
+.bw-landing .heromock:hover {
+  transform: translateY(-51%) rotate(0deg);
+}
+.bw-landing .heromock__win {
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0b1615;
+  border: 1px solid rgba(190, 225, 218, 0.14);
+  box-shadow:
+    0 2px 6px rgba(20, 57, 43, 0.08),
+    0 24px 60px -18px rgba(20, 57, 43, 0.42),
+    0 60px 120px -60px rgba(20, 57, 43, 0.5);
+}
+
+/* ---- chrome ---- */
+.bw-landing .heromock__bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  background: #060e0d;
+  border-bottom: 1px solid rgba(190, 225, 218, 0.09);
+}
+.bw-landing .heromock__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(190, 225, 218, 0.22);
+  flex: none;
+}
+.bw-landing .heromock__dot:first-child { background: rgba(240, 166, 60, 0.75); }
+.bw-landing .heromock__url {
+  margin-left: 10px;
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  color: #67807b;
+}
+
+/* ---- layout ---- */
+.bw-landing .heromock__body {
+  display: grid;
+  grid-template-columns: minmax(0, 118px) minmax(0, 1fr);
+}
+.bw-landing .heromock__side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 10px;
+  border-right: 1px solid rgba(190, 225, 218, 0.08);
+  background: rgba(6, 14, 13, 0.55);
+}
+.bw-landing .heromock__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #67807b;
+}
+.bw-landing .heromock__nav i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(190, 225, 218, 0.2);
+  flex: none;
+}
+.bw-landing .heromock__nav.is-done {
+  color: #e9f3f0;
+  background: rgba(190, 225, 218, 0.05);
+}
+.bw-landing .heromock__nav.is-done i { background: #f0a63c; }
+
+.bw-landing .heromock__main {
+  padding: 14px;
+  display: grid;
+  gap: 11px;
+}
+
+/* ---- stat tiles ---- */
+.bw-landing .heromock__tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.bw-landing .heromock__tile {
+  padding: 9px 10px;
+  border-radius: 9px;
+  background: #101e1c;
+  border: 1px solid rgba(190, 225, 218, 0.08);
+}
+.bw-landing .heromock__tlabel {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #67807b;
+}
+.bw-landing .heromock__tval {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--font-fraunces), serif;
+  font-size: 19px;
+  line-height: 1.1;
+  color: #e9f3f0;
+}
+.bw-landing .heromock__tval em {
+  font-style: normal;
+  font-size: 12px;
+  color: #f0a63c;
+  margin-left: 3px;
+}
+
+/* ---- chart ---- */
+.bw-landing .heromock__chart {
+  padding: 10px 11px 6px;
+  border-radius: 9px;
+  background: #101e1c;
+  border: 1px solid rgba(190, 225, 218, 0.08);
+}
+.bw-landing .heromock__chead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #96ada8;
+  margin-bottom: 6px;
+}
+.bw-landing .heromock__cpct {
+  font-family: var(--font-jetbrains-mono), monospace;
+  color: #f0a63c;
+}
+.bw-landing .heromock__svg {
+  display: block;
+  width: 100%;
+  height: 46px;
+}
+
+/* ---- running row ---- */
+.bw-landing .heromock__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border-radius: 9px;
+  background: rgba(240, 166, 60, 0.07);
+  border: 1px solid rgba(240, 166, 60, 0.18);
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffd79b;
+}
+.bw-landing .heromock__spin {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid rgba(240, 166, 60, 0.28);
+  border-top-color: #f0a63c;
+  animation: bwSpin 0.9s linear infinite;
+}
+@keyframes bwSpin { to { transform: rotate(360deg); } }
+
+/* ---- floating result card ---- */
+.bw-landing .heromock__float {
+  position: absolute;
+  /* Neeche kaafi door: pehle ye window ke bottom-left par baith kar sidebar
+     ka aakhri module ("Chatbot") dhak leta tha. Ab sirf kona overlap hota
+     hai, koi content nahi chhupta. */
+  left: clamp(-44px, -4vw, -20px);
+  bottom: clamp(-34px, -3vw, -22px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 15px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(23, 51, 46, 0.08);
+  box-shadow: 0 18px 40px -14px rgba(20, 57, 43, 0.34);
+  transform: rotate(-1.4deg);
+}
+.bw-landing .heromock__fcheck {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 50%;
+  background: #f0a63c;
+  color: #17332e;
+  font-size: 13px;
+  font-weight: 800;
+}
+.bw-landing .heromock__float strong {
+  display: block;
+  font-size: 12.5px;
+  color: #17332e;
+}
+.bw-landing .heromock__float em {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  color: #67807b;
+}
+
+/* Chhoti screens par mockup hero ke neeche aata hai (absolute nahi rehta),
+   warna wo copy ke oopar chadh jata hai. */
+@media (max-width: 1080px) {
+  .bw-landing .heromock {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: min(560px, 100%);
+    margin: 34px auto 0;
+    transform: none;
+  }
+  .bw-landing .heromock:hover { transform: none; }
+  .bw-landing .heromock__float { left: auto; right: 10px; bottom: -14px; }
+}
+@media (max-width: 560px) {
+  .bw-landing .heromock__body { grid-template-columns: minmax(0, 1fr); }
+  .bw-landing .heromock__side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: 0;
+    border-bottom: 1px solid rgba(190, 225, 218, 0.08);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATS STRIP  —  hero aur features ke darmiyan
+   ═══════════════════════════════════════════════════════════════════ */
+.bw-landing .stats {
+  position: relative;
+  z-index: 3;
+  background: #060e0d;
+  border-block: 1px solid rgba(190, 225, 218, 0.1);
+}
+.bw-landing .stats__in {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  padding-block: 0;
+  background: rgba(190, 225, 218, 0.1);
+}
+.bw-landing .stats__cell {
+  background: #060e0d;
+  padding: clamp(22px, 3vw, 34px) clamp(14px, 2vw, 26px);
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  transition: background 0.25s ease;
+}
+.bw-landing .stats__cell:hover { background: #0b1615; }
+.bw-landing .stats__v {
+  font-family: var(--font-fraunces), serif;
+  font-size: clamp(28px, 3.4vw, 40px);
+  line-height: 1;
+  color: #f0a63c;
+}
+.bw-landing .stats__l {
+  font-size: clamp(11.5px, 1.1vw, 13px);
+  line-height: 1.45;
+  color: #96ada8;
+}
+@media (max-width: 860px) {
+  .bw-landing .stats__in { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 440px) {
+  .bw-landing .stats__in { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FEATURE CARDS — gehrai aur hover
+   ═══════════════════════════════════════════════════════════════════
+   Cards pehle bilkul flat thin: safed par safed, koi saya nahi, hover par
+   kuch nahi hota tha. Grid theek thi magar "premium" nahi lagti thi.
+   ═══════════════════════════════════════════════════════════════════ */
+.bw-landing .band__cell {
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+.bw-landing .band__cell:hover {
+  transform: translateY(-3px);
+  border-color: rgba(240, 166, 60, 0.45);
+  box-shadow: 0 18px 40px -22px rgba(20, 57, 43, 0.42);
+}
+.bw-landing .band__cell:hover .band__icon {
+  background: #f0a63c;
+  border-color: #f0a63c;
+  color: #17332e;
+}
+.bw-landing .band__icon {
+  transition: background 0.28s ease, color 0.28s ease, border-color 0.28s ease;
+}
+
+/*
+ * Hero copy vs mockup — takrao ka ilaj.
+ *
+ * Naapa gaya (dev par, asal DOM se): 1280px par headline ka daayan kinara
+ * mockup se 91px OVERLAP kar raha tha, 1366 par 35px. Text mockup ke neeche
+ * chala jata tha. Clip nahi ho raha tha — is liye nazar se pakarna mushkil
+ * tha, screenshot par bhi saaf nahi dikhta.
+ *
+ * 620px ki fixed chaurai badi screens ke liye theek hai; chhoti desktop
+ * widths par usay viewport ke saath simatna chahiye. 40vw un teenon widths
+ * par mockup se pehle ruk jata hai, aur 1440+ par min() 620 hi rakhta hai —
+ * yani bari screens par koi farq nahi parta.
+ *
+ * 1080px se neeche mockup khud static ho jata hai (upar wali media query),
+ * is liye ye hadd sirf us ke oopar lagti hai.
+ */
+@media (min-width: 1081px) {
+  .bw-landing .hero__copy {
+    max-width: min(620px, 40vw);
+  }
+}
+
+/* Headline ki lines ko barabar karo. Bina is ke aakhri line par ek-do lafz
+   reh jate hain aur "AI-powered" beech se toot jata hai. */
+.bw-landing .hero h1 {
+  text-wrap: balance;
+}

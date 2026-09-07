@@ -1,0 +1,23 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Secrets — backend repo ka apna .gitignore ye cover nahi kar raha tha.
+.env
+.env.*
+# Keys-only template — ye commit hona CHAHIYE.
+!.env.example
+
+# ML model weights — XLM-RoBERTa ka model.safetensors ~1.04 GB hai.
+# GitHub 100 MB par hard-reject karta hai, is liye weights repo mein nahi jate.
+# Naye machine par model alag se copy/download karo (README dekho).
+modules/sentiment/models/xlm-roberta-sentiment-final/
+*.safetensors
+*.pkl
