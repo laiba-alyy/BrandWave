@@ -30,12 +30,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-# ...but the keys-only templates MUST be committed, warna koi setup nahi kar sakta.
-!.env.example
-!backend/.env.example
-
 # vercel
 .vercel
 
@@ -70,9 +64,6 @@ backend/scripts/merge_backup_*.json
 # ─────────────────────────────────────────────────────────────────────────
 
 # ── Secrets ──────────────────────────────────────────────────────────────
-# `.env*` upar pehle se hai aur wo backend/.env ko bhi cover karta hai
-# (leading slash na hone ki wajah se pattern har level par lagta hai).
-# Ye baqi shaklein hain jo aksar reh jati hain:
 *.key
 *.p12
 *.pfx
@@ -82,11 +73,6 @@ backend/scripts/merge_backup_*.json
 id_rsa
 id_rsa.pub
 *.ppk
-
-# AWS ke apne credentials — kabhi repo mein nahi.
-.aws/
-aws-credentials*
-*.aws.json
 
 # Service-account / OAuth JSON (Google, Firebase waghera)
 service-account*.json
