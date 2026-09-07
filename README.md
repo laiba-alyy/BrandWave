@@ -170,7 +170,7 @@ The fine-tuned XLM-RoBERTa weights are **not in this repository**.
 ```bash
 pip install -U "huggingface_hub[cli]"
 
-hf download laiba-alyy/brandwave-sentiment-xlm-roberta \
+hf download laibialy/brandwave-sentiment-xlm-roberta \
   --local-dir backend/modules/sentiment/models/xlm-roberta-sentiment-final
 ```
 
@@ -226,15 +226,23 @@ unaffected. The backend logs the exact path it searched at startup.
 
 ```bash
 pip install -U "huggingface_hub[cli]"
-hf auth login          # paste a token with write scope
+hf auth login          # paste a token with the WRITE role, not read
 
-hf upload laiba-alyy/brandwave-sentiment-xlm-roberta \
+hf upload laibialy/brandwave-sentiment-xlm-roberta \
   ./backend/modules/sentiment/models/xlm-roberta-sentiment-final . \
+  --exclude "training_args.bin" \
   --repo-type model
 ```
 
-Create the repo first at https://huggingface.co/new if it does not exist, and
-keep it **public** so judges and collaborators can download without a token.
+`hf upload` creates the repo on first push, so there is nothing to set up on the
+website beforehand. The trailing `.` places the files at the repo root, which is
+where `from_pretrained()` looks for them.
+
+`training_args.bin` is excluded deliberately: it is a pickled `TrainingArguments`
+object holding absolute paths from the training machine, and inference never
+reads it.
+
+Keep the repo **public** so it downloads without a token.
 
 </details>
 
