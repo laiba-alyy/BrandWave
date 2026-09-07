@@ -7,7 +7,7 @@ normally needs a whole agency: scrape and understand your storefront, audit SEO,
 read what customers actually feel, generate image and video ads from real product
 data, and hand visitors an embeddable support chatbot.
 
-Final Year Project — Next.js frontend, FastAPI backend, Supabase auth and data.
+Next.js frontend, FastAPI backend, Supabase auth and data.
 
 ---
 
