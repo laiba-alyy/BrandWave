@@ -30,6 +30,14 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# ── Env files ────────────────────────────────────────────────────────────
+# `.env*` has no leading slash, so it applies at EVERY level — this covers
+# backend/.env too. The `!` lines below are what allow the keys-only templates
+# through; without them nobody can set the project up.
+.env*
+!.env.example
+!backend/.env.example
+
 # vercel
 .vercel
 
@@ -73,6 +81,11 @@ backend/scripts/merge_backup_*.json
 id_rsa
 id_rsa.pub
 *.ppk
+
+# AWS ke apne credentials — kabhi repo mein nahi.
+.aws/
+aws-credentials*
+*.aws.json
 
 # Service-account / OAuth JSON (Google, Firebase waghera)
 service-account*.json
