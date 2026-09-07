@@ -42,7 +42,7 @@ Google Gemini, DataForSEO, Pinecone
 
 - **Node.js** 18+
 - **Python** 3.10+
-- **PostgreSQL** (or a Supabase project)
+- **PostgreSQL** ( a Supabase project)
 - **FFmpeg** — required by moviepy for video end cards
 
 ---
@@ -56,31 +56,14 @@ git clone https://github.com/laiba-alyy/BrandWave.git
 cd BrandWave
 ```
 
-### 2. Frontend
-
-```bash
-npm install
-cp .env.example .env      # then fill in your values
-npm run dev
 ```
 
-Runs at **http://localhost:3000**.
+Frotend Runs at **http://localhost:3000**.
 
-### 3. Backend
 
-```bash
-cd backend
-python -m venv .venv
-source .venv/Scripts/activate    # Windows (Git Bash)
-# source .venv/bin/activate      # macOS / Linux
-
-pip install -r requirements.txt
-cp .env.example .env             # then fill in your values
-
-uvicorn main:app --reload --port 8000
 ```
 
-Runs at **http://localhost:8000**. Interactive API docs at **/docs**.
+Backend Runs at **http://localhost:8000**. Interactive API docs at **/docs**.
 
 ### 4. Sentiment model weights (separate download)
 
@@ -98,20 +81,6 @@ backend/modules/sentiment/models/xlm-roberta-sentiment-final/
 └── training_config.json
 ```
 
-Or point `SENTIMENT_MODEL_DIR` at wherever you keep it. Every other module runs
-without it; only sentiment analysis needs the weights.
-
----
-
-## Environment Variables
-
-Two separate env files. Both are gitignored — **never commit a filled-in one.**
-
-- **`.env`** (repo root) — frontend. See [`.env.example`](.env.example).
-- **`backend/.env`** — backend. See [`backend/.env.example`](backend/.env.example).
-
-The keys that matter most:
-
 | Variable | Where | Purpose |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | root | Supabase client auth |
@@ -124,32 +93,7 @@ The keys that matter most:
 | `SMTP_PASSWORD` | backend | Chatbot escalation email. Gmail: use an **App Password** |
 | `CORS_ALLOWED_ORIGINS` | backend | Must include your frontend origin |
 
----
 
-## Deployment (AWS EC2)
-
-The backend runs on an EC2 instance behind an Elastic IP.
-
-1. **Security group** — open `8000` (backend) and `3000` (frontend), or put both
-   behind a reverse proxy on `80`/`443`.
-2. **Create `backend/.env` on the server.** It is gitignored by design, so it
-   never arrives via `git pull` — copy it across separately.
-3. **Point the URLs at the instance**, not localhost:
-
-   ```env
-   # .env  (frontend)
-   NEXT_PUBLIC_API_URL=http://<elastic-ip>:8000
-
-   # backend/.env
-   BACKEND_PUBLIC_URL=http://<elastic-ip>:8000
-   FRONTEND_URL=http://<elastic-ip>:3000
-   CORS_ALLOWED_ORIGINS=http://<elastic-ip>:3000
-   ```
-
-   `CORS_ALLOWED_ORIGINS` must match the frontend origin exactly or every API
-   call fails in the browser. `BACKEND_PUBLIC_URL` is what gets baked into the
-   embeddable chatbot `<script>` tag customers paste on their own sites — if it
-   still says `localhost`, the widget silently breaks for every visitor.
 
 4. **Copy the sentiment model** to the instance (see step 4 above). Budget ~1 GB
    of RAM for it: the predictor is a process-wide singleton, loaded once at first
@@ -187,13 +131,4 @@ The backend runs on an EC2 instance behind an Elastic IP.
     └── scripts/            # Maintenance and migration scripts
 ```
 
----
 
-## Security Notes
-
-- All `.env*` files are gitignored, at every directory level.
-- Generated ads, uploads, scraped PDFs, and database backup dumps are excluded —
-  they contain real user content.
-- Model weights (`*.safetensors`, `*.pkl`, `*.pt`) are excluded.
-- If a key is ever exposed, rotate it. `SUPABASE_SERVICE_ROLE_KEY` and
-  `SMTP_PASSWORD` are the two worth guarding hardest.
