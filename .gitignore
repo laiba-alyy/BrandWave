@@ -157,3 +157,6 @@ _quarantine/
 
 # Qoder IDE generated wiki — tool output, not source
 .qoder/
+
+# Claude Code local settings — per-machine tool permissions, not project source
+.claude/

@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(netstat -ano)",
-      "Bash(taskkill *)"
-    ]
-  }
-}

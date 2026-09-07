@@ -326,6 +326,11 @@ their provider keys.
 ├── lib/                    # API clients and helpers
 ├── types/                  # Shared TypeScript types
 ├── public/                 # Static assets, feature videos
+├── db/
+│   └── policies.sql        # Supabase RLS policies + column grants (see Security Notes)
+├── FAQs.txt                # Sample chatbot training data — for testing
+├── KnowledegeDocument.txt  # Sample chatbot knowledge base — for testing
+├── TestWidget.html         # Standalone page for testing the embeddable chat widget
 └── backend/
     ├── main.py             # FastAPI app + route registration
     ├── api/routes/         # HTTP endpoints, one file per module
@@ -349,5 +354,12 @@ their provider keys.
 - Model weights (`*.safetensors`, `*.pkl`, `*.pt`) are excluded.
 - Provider keys live only in `backend/.env`. The browser bundle carries the
   Supabase **anon** key and the API URL, nothing else.
+- **Role escalation is blocked at the database layer.** Row-level security alone
+  was not enough: RLS decides which *row* you may write, and a user updating
+  their own `role` to `admin` is writing their own row. `db/policies.sql` revokes
+  column-level `UPDATE` on `role` and `email_verified` from `anon` and
+  `authenticated`, so Postgres refuses before RLS is consulted. Promotion now
+  requires the service-role key. Run that file in the Supabase SQL editor when
+  setting up a new project — it is idempotent and ends with verification queries.
 - If a key is ever exposed, rotate it. `SUPABASE_SERVICE_ROLE_KEY` and
   `SMTP_PASSWORD` are the two worth guarding hardest.
