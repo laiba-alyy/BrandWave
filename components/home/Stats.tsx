@@ -7,7 +7,7 @@
  *
  * YAHAN KOI GHARA HUA ADAD NAHI. Landing pages aksar "500+ brands trust us"
  * likh dete hain — hamare paas aise customers hain hi nahi, aur jhoota adad
- * likhna FYP demo mein pakra bhi ja sakta hai. Har number neeche wale code se
+ * likhna demo mein pakra bhi ja sakta hai. Har number neeche wale code se
  * aata hai:
  *
  *   9 modules      -> app/business ke nau routes
