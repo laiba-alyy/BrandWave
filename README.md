@@ -277,7 +277,7 @@ their provider keys.
 |---|---|
 | `GROQ_API_KEY` | Primary LLM — SEO keywords, chatbot, AI assistant |
 | `FAL_API_KEY` | Video ads — powers **both** Kling and Veo 3.1 |
-| `GEMINI_API_KEY` | Image ad generation |
+| `Bria and Claid` | Image ad generation |
 | `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` | Live Google keyword volume |
 | `YOUTUBE_API_KEY` | YouTube comment ingestion for sentiment |
 | `PINECONE_API_KEY` | Chatbot knowledge retrieval |
