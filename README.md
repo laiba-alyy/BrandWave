@@ -287,14 +287,7 @@ their provider keys.
 
 `backend/.env.example` documents all of them with inline notes.
 
-### Two variables that break things quietly
 
-- **`NEXT_PUBLIC_API_URL`** is read at **build time** by Next.js and baked into
-  the browser bundle. Changing it means rebuilding the frontend — restarting is
-  not enough.
-- **`BACKEND_PUBLIC_URL`** is baked into the embeddable chatbot `<script>` tag
-  that customers paste on their own sites. If it still says `localhost`, the
-  widget works for you and silently fails for every real visitor.
 
 ---
 
